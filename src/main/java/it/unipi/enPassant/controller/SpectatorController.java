@@ -22,26 +22,9 @@ public class SpectatorController extends GenericUserController{
   }
 
   @PostMapping("/login")
-  public ResponseEntity<String> loginSpectator(@RequestBody LoginRequest loginRequest) {
-    try {
-
-      if(spectatorservice.spectatorLoginControl(loginRequest)){
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
-      }
-      else{
-        return new ResponseEntity<>("Login failed", HttpStatus.UNAUTHORIZED);
-      }
-
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  /* Here we have all the API endpoints */
-  @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
     try {
-      if(authservice.PlayerLoginControl(loginRequest)){
+      if(authservice.spectatorLoginControl(loginRequest)){
         return new ResponseEntity<>("Login successful", HttpStatus.OK);
       }
       else{
