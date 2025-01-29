@@ -1,10 +1,14 @@
 package it.unipi.enPassant.controller;
 
+import it.unipi.enPassant.model.requests.StatsModel;
+import it.unipi.enPassant.model.requests.DataUserModel;
 import it.unipi.enPassant.model.requests.LoginRequest;
 import it.unipi.enPassant.service.AuthenticationService;
 import it.unipi.enPassant.service.DataService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -25,4 +29,24 @@ public abstract class GenericUserController {
 
   public abstract ResponseEntity<String> login(@RequestBody LoginRequest loginRequest);
 
+  @GetMapping("/viewData/{username}")
+  public ResponseEntity<DataUserModel> viewData(@PathVariable String username){
+    DataUserModel data = dataservice.dataUserGet(username);
+
+    if (data==null) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    return ResponseEntity.ok(data);
+  }
+
+  @GetMapping("/searchPlayerStats/{username}")
+  public ResponseEntity<StatsModel> searchPlayerStats(@PathVariable String username){
+    StatsModel stats = dataservice.dataGetPlayerStats(username);
+
+    if (stats==null) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    return ResponseEntity.ok(stats);
+  }
 }
+
