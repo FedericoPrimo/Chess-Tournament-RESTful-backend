@@ -3,7 +3,7 @@ package it.unipi.enPassant.controller;
 import it.unipi.enPassant.model.requests.MatchListModel;
 import it.unipi.enPassant.model.requests.MatchModel;
 import it.unipi.enPassant.model.requests.TournamentModel;
-import it.unipi.enPassant.service.DataService;
+import it.unipi.enPassant.service.DataServiceTournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +15,11 @@ import java.util.List;
 @RequestMapping("api/tournament")
 public class TournamentController{
     // Services used for interacting with the databases
-    private final DataService dataService;
+    private final DataServiceTournament dataService;
 
     // Constructor for the TournamentController
     @Autowired
-    public TournamentController(DataService dataService) {
+    public TournamentController(DataServiceTournament dataService) {
         this.dataService = dataService;
     }
 
