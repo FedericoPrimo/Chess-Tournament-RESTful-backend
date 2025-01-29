@@ -14,4 +14,11 @@ public class AuthenticationService {
     // Prendi da mongo password corrisposta a username e fai il check
     return true;
   }
+
+  public boolean spectatorLoginControl(LoginRequest loginRequest) {
+    // Prendi da mongo password corrisposta a username e fai il check
+    return true;
+  }
+
 }
+
