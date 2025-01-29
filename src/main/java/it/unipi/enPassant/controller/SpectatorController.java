@@ -13,16 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/spectator")
-public class SpectatorController {
-  // Services used for authentication and interacting with the databases.
-  private final AuthenticationService spectatorservice;
-  private final DataService spectatorDataService;
+public class SpectatorController extends GenericUserController{
 
   // Constructor for the SpectatorController
   @Autowired
-  public SpectatorController(AuthenticationService spectatorservice, DataService spectatorDataService){
-    this.spectatorservice = spectatorservice;
-    this.spectatorDataService = spectatorDataService;
+  public SpectatorController(AuthenticationService authservice, DataService dataservice){
+    super(authservice, dataservice);
   }
 
   @PostMapping("/login")
@@ -42,5 +38,18 @@ public class SpectatorController {
   }
 
   /* Here we have all the API endpoints */
+  @PostMapping("/login")
+  public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    try {
+      if(authservice.PlayerLoginControl(loginRequest)){
+        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+      }
+      else{
+        return new ResponseEntity<>("Login failed", HttpStatus.UNAUTHORIZED);
+      }
 
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
