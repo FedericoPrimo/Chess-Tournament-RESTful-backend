@@ -98,7 +98,7 @@ public class ManagerController extends GenericUserController{
     }
   }
 
-  @DeleteMapping("c")
+  @DeleteMapping("/checkPlayerRequest")
   public ResponseEntity<PlayerRequestModel> checkPlayerRequest() {
     PlayerRequestModel textRequest = managerService.checkPlayerRequest();
     return new ResponseEntity<>(textRequest, HttpStatus.OK);
