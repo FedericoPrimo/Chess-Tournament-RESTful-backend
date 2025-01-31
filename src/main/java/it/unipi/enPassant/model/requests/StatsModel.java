@@ -8,4 +8,22 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StatsModel {
     private int elo;
+    // Costruttore vuoto
+    public StatsModel() {
+    }
+
+    // Costruttore con parametri
+    public StatsModel(int elo) {
+        this.elo = elo;
+    }
+
+    // Getter
+    public int getElo() {
+        return elo;
+    }
+
+    // Setter
+    public void setElo(int elo) {
+        this.elo = elo;
+    }
 }

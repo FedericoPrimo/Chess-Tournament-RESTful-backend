@@ -24,13 +24,13 @@ public class DataUserModel {
         private int elo;
 
         @JsonProperty("birthdate")
-        private LocalDate birthdate;
+        private String birthdate;
 
         // Costruttore vuoto necessario per Jackson
         public DataUserModel() {}
 
         // Costruttore con parametri
-        public DataUserModel(String name, String surname, String username, int elo, LocalDate birthdate) {
+        public DataUserModel(String name, String surname, String username, int elo, String birthdate) {
             this.name = name;
             this.surname = surname;
             this.username = username;

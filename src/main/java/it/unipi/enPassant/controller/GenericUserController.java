@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 /* Abstract class, not a spring bean so it must be called by its child*/
 public abstract class GenericUserController {
   protected final AuthenticationService authservice;
@@ -32,6 +34,16 @@ public abstract class GenericUserController {
   @GetMapping("/viewData/{username}")
   public ResponseEntity<DataUserModel> viewData(@PathVariable String username){
     DataUserModel data = dataservice.dataUserGet(username);
+
+    if (data==null) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    return ResponseEntity.ok(data);
+  }
+
+  @GetMapping("/viewUser")
+  public ResponseEntity<List<String>> getAllUserIds(){
+    List<String> data = dataservice.getAllUserIds();
 
     if (data==null) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
