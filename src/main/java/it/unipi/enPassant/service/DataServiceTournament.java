@@ -1,8 +1,6 @@
 package it.unipi.enPassant.service;
 
-import it.unipi.enPassant.model.requests.MatchListModel;
-import it.unipi.enPassant.model.requests.MatchModel;
-import it.unipi.enPassant.model.requests.TournamentModel;
+import it.unipi.enPassant.model.requests.*;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,11 @@ public class DataServiceTournament {
     private TournamentRepository tournamentRepository;
     // @Autowire ai servizi che ci servono per mongo e redis
     public List<TournamentModel> tournamentGetList() {
-        return tournamentRepository.findAllProjected();
+        List<DocumentTournament> lista = tournamentRepository.findAll();
+
+        return lista.stream()
+                .map(doc -> new TournamentModel( doc.getEdition(), doc.getCategory(), doc.getLocation()))
+                .collect(Collectors.toList());
     }
 
     public List<MatchListModel> liveMatchGetList() {
@@ -30,8 +32,12 @@ public class DataServiceTournament {
         return tournamentRepository.findTournamentMatches(edition, category, location);
     }
 
-    public MatchModel tournamentMatchGet(String category,int edition,String location, String Black, String White) {
-        return tournamentRepository.findMatchofTournament(edition, category, location, White, Black);
+    public DocumentMatch tournamentMatchGet(String category, int edition, String location, String Black, String White) {
+        System.out.println(Black);
+        System.out.println(White);
+        DocumentMatch match = tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
+        System.out.println(match);
+        return tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
     }
 
     public MatchModel liveMatchGet(String Black,String White) {

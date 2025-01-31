@@ -1,31 +1,32 @@
 package it.unipi.enPassant.repositories;
 
+import it.unipi.enPassant.model.requests.DocumentMatch;
 import it.unipi.enPassant.model.requests.DocumentTournament;
 import it.unipi.enPassant.model.requests.MatchListModel;
-import it.unipi.enPassant.model.requests.MatchModel;
-import it.unipi.enPassant.model.requests.TournamentModel;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface TournamentRepository extends MongoRepository<DocumentTournament, String>{
-    @Query(value = "{}", fields = "{ 'category': 1, 'edition': 1, 'location': 1 }")
-    List<TournamentModel> findAllProjected();
 
-    @Query(value = "{ 'edition': ?0, 'category': ?1, 'location': ?2 }",
-            fields = "{ 'rawMatches.White': 1, 'rawMatches.Black': 1 }")
-    List<MatchListModel> findTournamentMatches(int edition, String category, String location);
+    List<DocumentTournament> findAll();
 
-    @Query(value = "{ 'edition': ?0, 'category': ?1, 'location': ?2, 'rawMatches.White': ?3, 'rawMatches.Black': ?4 }",
-            fields = "{ 'rawMatches': 1}")
-    MatchModel findMatchofTournament(int edition, String category, String location, String White, String Black);
-    /*
-    chatGPT suggerirebbe di fare la query cosi
-     @Query(value = "{ 'edition': ?0, 'category': ?1, 'location': ?2, 'rawMatches':
-                        { $elemMatch: { 'white': ?3, 'black': ?4 } } }",
-           fields = "{ 'rawMatches.$': 1, '_id': 0 }")
-     */
+    @Aggregation(pipeline = {
+            "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
+            "{ $unwind: '$RawMatches' }",
+            "{ $project: { '_id': 0, 'White': '$RawMatches.White', 'Black': '$RawMatches.Black' } }"
+    })
+    List<MatchListModel> findTournamentMatches(int Edition, String Category, String Location);
+
+    //test query  db.tournaments.aggregate([{ $match: { "Edition": 2004, "Category": "Blitz", "Location": "Amsterdam" } }, { $unwind: "$RawMatches" }, { $match: { "RawMatches.White": "alekhine_alexander", "RawMatches.Black": "lasker_emanuel" } }, { $project: { "_id": 0, "RawMatches": 1 } }])
+    @Aggregation(pipeline = {
+            "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
+            "{ $unwind: '$RawMatches' }",
+            "{ $match: { 'RawMatches.White': ?3, 'RawMatches.Black': ?4 } }",
+            "{ $project: { '_id': 0, 'RawMatches': 1 } }"
+    })
+    DocumentMatch findMatchofTournament(int edition, String category, String location, String Black, String White);
 }

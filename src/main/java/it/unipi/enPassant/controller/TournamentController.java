@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller;
 
+import it.unipi.enPassant.model.requests.DocumentMatch;
 import it.unipi.enPassant.model.requests.MatchListModel;
 import it.unipi.enPassant.model.requests.MatchModel;
 import it.unipi.enPassant.model.requests.TournamentModel;
@@ -62,10 +63,10 @@ public class TournamentController{
 
     /*this GET allows us to retrive the list of all information of a finished match.*/
     @GetMapping("/tournamentMatchList/match/{category}/{edition}/{location}/{black}/{white}")
-    public ResponseEntity<MatchModel> getTournamentMatch(
+    public ResponseEntity<DocumentMatch> getTournamentMatch(
             @PathVariable String category, @PathVariable int edition, @PathVariable String location,
             @PathVariable String black, @PathVariable String white){
-        MatchModel tournamentMatch = dataService.tournamentMatchGet(category, edition, location, white, black);
+        DocumentMatch tournamentMatch = dataService.tournamentMatchGet(category, edition, location, white, black);
 
         if (tournamentMatch==null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
