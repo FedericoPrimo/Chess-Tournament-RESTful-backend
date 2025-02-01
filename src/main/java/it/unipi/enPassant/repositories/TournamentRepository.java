@@ -1,6 +1,4 @@
 package it.unipi.enPassant.repositories;
-
-import it.unipi.enPassant.model.requests.DocumentMatch;
 import it.unipi.enPassant.model.requests.DocumentTournament;
 import it.unipi.enPassant.model.requests.MatchListModel;
 import org.springframework.data.mongodb.repository.Aggregation;
