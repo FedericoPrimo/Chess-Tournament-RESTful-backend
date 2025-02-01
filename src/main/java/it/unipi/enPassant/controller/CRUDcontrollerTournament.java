@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/tournamnetsCRUD")
+@RequestMapping("api/tournamentsCRUD")
 public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament, String> {
     public CRUDcontrollerTournament(CRUDrepositoryTournament repository) {
         super(repository);

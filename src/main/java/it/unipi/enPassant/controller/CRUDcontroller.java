@@ -1,9 +1,11 @@
 package it.unipi.enPassant.controller;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class CRUDcontroller<T, ID> {
 
@@ -39,11 +41,13 @@ public abstract class CRUDcontroller<T, ID> {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable ID id) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable ID id) {
         if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Entity with ID " + id + " not found"));
         }
+
         repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Entity with ID " + id + " deleted successfully"));
     }
 }
