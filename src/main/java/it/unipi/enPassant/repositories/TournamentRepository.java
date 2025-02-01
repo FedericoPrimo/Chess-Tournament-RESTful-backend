@@ -25,8 +25,7 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
     @Aggregation(pipeline = {
             "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
             "{ $unwind: '$RawMatches' }",
-            "{ $match: { 'RawMatches.White': ?3, 'RawMatches.Black': ?4 } }",
-            "{ $project: { '_id': 0, 'RawMatches': 1 } }"
+            "{ $match: { 'RawMatches.White': ?3, 'RawMatches.Black': ?4 } }"
     })
-    DocumentMatch findMatchofTournament(int edition, String category, String location, String Black, String White);
+    DocumentTournament findMatchofTournament(int edition, String category, String location, String Black, String White);
 }

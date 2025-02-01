@@ -14,11 +14,11 @@ public class DocumentTournament {
     private String id;
     private int Edition;
     private String Category;
-    private String entryClosingDate;
+    private String Entry_Closing_Date;
     private String Location;
-    private String winner;  // Potrebbe essere null
+    private String Winner;  // Potrebbe essere null
 
-    private List<DocumentMatch> rawMatches;  // Lista dei match
+    private List<DocumentMatch> RawMatches;  // Lista dei match
 
     // Costruttori, Getter e Setter
     public DocumentTournament() {}
@@ -27,10 +27,10 @@ public class DocumentTournament {
                               String location, String winner, List<DocumentMatch> rawMatches) {
         this.Edition = edition;
         this.Category = category;
-        this.entryClosingDate = entryClosingDate;
+        this.Entry_Closing_Date = entryClosingDate;
         this.Location = location;
-        this.winner = winner;
-        this.rawMatches = rawMatches;
+        this.Winner = winner;
+        this.RawMatches = rawMatches;
     }
 
     // Getter
@@ -46,8 +46,8 @@ public class DocumentTournament {
         return Category;
     }
 
-    public String getEntryClosingDate() {
-        return entryClosingDate;
+    public String getEntry_Closing_Date() {
+        return Entry_Closing_Date;
     }
 
     public String getLocation() {
@@ -55,11 +55,11 @@ public class DocumentTournament {
     }
 
     public String getWinner() {
-        return winner;
+        return Winner;
     }
 
     public List<DocumentMatch> getRawMatches() {
-        return rawMatches;
+        return RawMatches;
     }
 
     // Setter
@@ -75,8 +75,8 @@ public class DocumentTournament {
         this.Category = category;
     }
 
-    public void setEntryClosingDate(String entryClosingDate) {
-        this.entryClosingDate = entryClosingDate;
+    public void setEntry_Closing_Date(String entry_Closing_Date) {
+        this.Entry_Closing_Date = entry_Closing_Date;
     }
 
     public void setLocation(String location) {
@@ -84,10 +84,10 @@ public class DocumentTournament {
     }
 
     public void setWinner(String winner) {
-        this.winner = winner;
+        this.Winner = winner;
     }
 
     public void setRawMatches(List<DocumentMatch> rawMatches) {
-        this.rawMatches = rawMatches;
+        this.RawMatches = rawMatches;
     }
 }

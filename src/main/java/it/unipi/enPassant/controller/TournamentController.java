@@ -63,10 +63,10 @@ public class TournamentController{
 
     /*this GET allows us to retrive the list of all information of a finished match.*/
     @GetMapping("/tournamentMatchList/match/{category}/{edition}/{location}/{black}/{white}")
-    public ResponseEntity<DocumentMatch> getTournamentMatch(
+    public ResponseEntity<List<DocumentMatch>> getTournamentMatch(
             @PathVariable String category, @PathVariable int edition, @PathVariable String location,
             @PathVariable String black, @PathVariable String white){
-        DocumentMatch tournamentMatch = dataService.tournamentMatchGet(category, edition, location, white, black);
+        List<DocumentMatch> tournamentMatch = dataService.tournamentMatchGet(category, edition, location, white, black);
 
         if (tournamentMatch==null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
