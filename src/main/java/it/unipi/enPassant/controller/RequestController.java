@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/requests")
+@RequestMapping("api/requests")
 public class RequestController {
 
     @Autowired
     private RequestService requestService;
 
     // Aggiungere una nuova richiesta in coda
-    @PostMapping
+    @PostMapping("/insert")
     public Long addRequest(@RequestBody Request request) {
         return requestService.addRequest(request);
     }

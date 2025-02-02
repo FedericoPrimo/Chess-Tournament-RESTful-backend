@@ -32,39 +32,56 @@ public class RequestService {
         String key = REQUEST_PREFIX + maxProgressive;
 
         redisTemplate.opsForValue().set(key, request);
+        System.out.println(key);
         return maxProgressive;
     }
 
     // Leggere ed eliminare la richiesta più vecchia (in testa)
     public Request consumeNextRequest() {
-        initializeProgressives();
+        initializeProgressives(); // Assicura che i progressivi esistano
 
-        Long minProgressive = (Long) redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY);
-        Long maxProgressive = (Long) redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY);
+        // Recupera i progressivi come String
+        Long minProgressive = redisTemplate.opsForValue().increment(MIN_PROGRESSIVE_KEY);
 
-        if (minProgressive > maxProgressive) {
-            return null; // La coda è vuota
-        }
+        System.out.println("DEBUG: minProgressive = " + minProgressive);
 
-        String key = REQUEST_PREFIX + minProgressive;
+        String key = REQUEST_PREFIX + (minProgressive-1);
+        System.out.println("DEBUG: Recupero la richiesta con chiave: " + key);
+
         Request request = (Request) redisTemplate.opsForValue().get(key);
 
         if (request != null) {
-            redisTemplate.delete(key);
-            redisTemplate.opsForValue().increment(MIN_PROGRESSIVE_KEY); // Avanza la testa della coda
+            System.out.println("DEBUG: Richiesta trovata: " + request);
+            redisTemplate.delete(key); // Elimina la richiesta dalla coda
+            System.out.println("DEBUG: Richiesta eliminata. Nuovo minProgressive: " +
+                    redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY));
+        } else {
+            System.out.println("DEBUG: Coda vuota, tutte le richieste sono state revisionate.");
+
+            redisTemplate.opsForValue().set(MIN_PROGRESSIVE_KEY, 1L);
+            redisTemplate.opsForValue().set(MAX_PROGRESSIVE_KEY, 0L);
+            System.out.println("DEBUG: Progressivi resettati.");
+
+            return new Request("NO_REQUEST", "All requests have been reviewed.");
         }
 
         return request;
     }
 
+
     // Controllare il numero di richieste ancora in coda
     public Long getQueueSize() {
         initializeProgressives();
 
-        Long minProgressive = (Long) redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY);
-        Long maxProgressive = (Long) redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY);
+        // Recupera i progressivi e li converte correttamente in Long
+        Long minProgressive = redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY) != null ?
+                Long.parseLong(redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY).toString()) : 1L;
 
-        return maxProgressive - minProgressive + 1;
+        Long maxProgressive = redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY) != null ?
+                Long.parseLong(redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY).toString()) : 0L;
+
+        // Assicuriamoci che il valore restituito sia sempre >= 0
+        return Math.max(0, maxProgressive - minProgressive + 1);
     }
 
     // 🔹 Resettare la coda
