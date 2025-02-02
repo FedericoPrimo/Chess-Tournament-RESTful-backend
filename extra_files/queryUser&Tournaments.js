@@ -21,6 +21,7 @@ db.tournaments.createIndex({
 // il risultato viene ordinato in ordine decrescente; raggruppando sul id del giocatore e scegliendo la prima voce per quanto riguarda l'apertura 
 // troviamo infine la opening più usata per ogni giocatore visto che era stato precedentemente ordinato.
   db.user.aggregate([
+    //{ $match: {"_id": 'frattacci_jonathan'}},
     { $unwind: "$Matches" },
     { $project: { userId: "$_id", opening: "$Matches.Opening" } },
     { $group: { _id: { userId: "$userId", opening: "$opening" }, count: { $sum: 1 } } },
@@ -75,7 +76,7 @@ db.user.find(
 // specifica categoria per ogniuno di questi record viene computata la media di quante mosse ha impiegato per vincere
     db.tournaments.aggregate([
         { $unwind: "$RawMatches" },
-        {$match: { "RawMatches.Winner": { $exists: true, $ne: "draw"}, "Edition": { $exists: true }  } },//aggiunta questa riga è da testare 
+        { $match: { "RawMatches.Winner": { $exists: true, $ne: "draw"}, "Edition": { $exists: true }  } },//aggiunta questa riga è da testare
         { $project: { edizione: "$Edition", category: "$Category", vincitore: "$RawMatches.Winner", numeroMosse: { $size: "$RawMatches.Moves" } } },
         { $group: { _id: { edizione: "$edizione",category:"$category", vincitore: "$vincitore" }, mediaMosse: { $avg: "$numeroMosse" }  } },
         { $sort: { "_id.edizione": 1,  "_id.category":1, "_id.vincitore": 1 } }
