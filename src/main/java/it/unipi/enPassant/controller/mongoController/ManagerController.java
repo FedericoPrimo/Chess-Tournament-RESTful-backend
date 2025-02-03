@@ -53,36 +53,6 @@ public class ManagerController extends GenericUserController {
     }
   }
 
-  @PostMapping("/disqualifyPlayer")
-  public ResponseEntity<String> disqualifyPlayer(@RequestBody String username) {
-    try {
-      if(managerService.disqualifyPlayer(username)){
-        return new ResponseEntity<>("player disqualified succesfully", HttpStatus.OK);
-      }
-      else{
-        return new ResponseEntity<>("failed to disqualify player", HttpStatus.UNAUTHORIZED);
-      }
-
-    }catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @PostMapping("/deleteMatch")
-  public ResponseEntity<String> deleteMatch(@RequestBody String White, String Black) {
-    try {
-      if(managerService.deleteMatch(White,Black)){
-        return new ResponseEntity<>("Match Deleted succesfully", HttpStatus.OK);
-      }
-      else{
-        return new ResponseEntity<>("failed to delete match", HttpStatus.UNAUTHORIZED);
-      }
-
-    }catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   @PostMapping("/createMaindraw")
   public ResponseEntity<String> createMaindraw() {
     try {
@@ -98,9 +68,4 @@ public class ManagerController extends GenericUserController {
     }
   }
 
-  @DeleteMapping("/checkPlayerRequest")
-  public ResponseEntity<PlayerRequestModel> checkPlayerRequest() {
-    PlayerRequestModel textRequest = managerService.checkPlayerRequest();
-    return new ResponseEntity<>(textRequest, HttpStatus.OK);
-  }
 }
