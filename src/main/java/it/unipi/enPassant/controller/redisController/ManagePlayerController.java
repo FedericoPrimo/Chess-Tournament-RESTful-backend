@@ -1,5 +1,5 @@
-package it.unipi.enPassant.controller;
-import it.unipi.enPassant.service.ManagePlayerService;
+package it.unipi.enPassant.controller.redisController;
+import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

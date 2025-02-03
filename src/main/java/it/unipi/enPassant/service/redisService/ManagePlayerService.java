@@ -1,4 +1,4 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.redisService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

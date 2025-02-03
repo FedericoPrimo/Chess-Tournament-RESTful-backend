@@ -1,4 +1,4 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.mongoModel.user;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document

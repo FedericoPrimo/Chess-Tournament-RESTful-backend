@@ -1,4 +1,4 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.redisModel;
 import java.io.Serializable;
 
 public class Request implements Serializable {

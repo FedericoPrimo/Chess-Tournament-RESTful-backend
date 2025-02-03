@@ -1,10 +1,10 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController;
 
-import it.unipi.enPassant.model.requests.DocumentMatch;
-import it.unipi.enPassant.model.requests.MatchListModel;
-import it.unipi.enPassant.model.requests.MatchModel;
-import it.unipi.enPassant.model.requests.TournamentModel;
-import it.unipi.enPassant.service.DataServiceTournament;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchModel;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentModel;
+import it.unipi.enPassant.service.mongoService.DataServiceTournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

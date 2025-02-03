@@ -1,6 +1,6 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.PlayerRequestModel;
+import it.unipi.enPassant.model.requests.redisModel.PlayerRequestModel;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,9 +1,9 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController;
 
 import it.unipi.enPassant.model.requests.LoginRequest;
 import it.unipi.enPassant.service.AuthenticationService;
-import it.unipi.enPassant.service.DataService;
-import it.unipi.enPassant.service.PlayerService;
+import it.unipi.enPassant.service.mongoService.DataService;
+import it.unipi.enPassant.service.mongoService.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

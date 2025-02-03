@@ -1,6 +1,6 @@
-package it.unipi.enPassant.controller;
-import it.unipi.enPassant.model.requests.DocumentMatch;
-import it.unipi.enPassant.model.requests.DocumentTournament;
+package it.unipi.enPassant.controller.mongoController.mongoCRUD;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.repositories.CRUDrepositoryTournament;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

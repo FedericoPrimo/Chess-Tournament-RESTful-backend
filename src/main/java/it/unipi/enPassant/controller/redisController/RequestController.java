@@ -1,7 +1,7 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.redisController;
 
-import it.unipi.enPassant.model.requests.Request;
-import it.unipi.enPassant.service.RequestService;
+import it.unipi.enPassant.model.requests.redisModel.Request;
+import it.unipi.enPassant.service.redisService.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

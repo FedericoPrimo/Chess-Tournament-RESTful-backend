@@ -1,5 +1,5 @@
-package it.unipi.enPassant.service;
-import it.unipi.enPassant.model.requests.Request;
+package it.unipi.enPassant.service.redisService;
+import it.unipi.enPassant.model.requests.redisModel.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

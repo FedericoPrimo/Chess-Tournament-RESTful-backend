@@ -1,4 +1,4 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 import org.springframework.stereotype.Service;
 
 @Service

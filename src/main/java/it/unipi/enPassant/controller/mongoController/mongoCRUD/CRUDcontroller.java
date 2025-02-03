@@ -1,4 +1,4 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController.mongoCRUD;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

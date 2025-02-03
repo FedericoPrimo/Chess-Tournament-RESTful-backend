@@ -1,6 +1,6 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.*;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.*;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class DataServiceTournament {
         return tournament.getRawMatches();
     }
 
-    public MatchModel liveMatchGet(String Black,String White) {
+    public MatchModel liveMatchGet(String Black, String White) {
         List<String> moves = List.of("e4", "e5", "Nf3", "Nc6", "Bb5", "a6");
         return new MatchModel(
                 2024,            // Data del match

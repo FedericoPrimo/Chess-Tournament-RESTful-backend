@@ -1,4 +1,4 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.mongoModel.tournament;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;

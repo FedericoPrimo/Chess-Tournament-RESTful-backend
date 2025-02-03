@@ -1,11 +1,11 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController;
 
 
 import it.unipi.enPassant.model.requests.LoginRequest;
-import it.unipi.enPassant.model.requests.PlayerRequestModel;
+import it.unipi.enPassant.model.requests.redisModel.PlayerRequestModel;
 import it.unipi.enPassant.service.AuthenticationService;
-import it.unipi.enPassant.service.DataService;
-import it.unipi.enPassant.service.ManagerService;
+import it.unipi.enPassant.service.mongoService.DataService;
+import it.unipi.enPassant.service.mongoService.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/manager")
-public class ManagerController extends GenericUserController{
+public class ManagerController extends GenericUserController {
   private final ManagerService managerService;
   // Constructor for the ManagerController
   @Autowired
