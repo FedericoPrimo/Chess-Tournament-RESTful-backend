@@ -1,8 +1,7 @@
 package it.unipi.enPassant.repositories;
 
 import it.unipi.enPassant.model.requests.DocumentTournament;
-import it.unipi.enPassant.model.requests.TournamentsAnalytic3Model;
-import it.unipi.enPassant.model.requests.TournamentsAnalyticAVGModel;
+import it.unipi.enPassant.model.requests.TournamentsAnalyticsModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -21,7 +20,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
             "{ $project:  {userId:  '$_id.winner', category:  '$_id.category', edition: '$_id.edition', howMany: '$avgMoves'}}",
             "{ $sort: { 'edition': 1, 'category': 1, 'userId': 1 } }"
     })
-    List<TournamentsAnalyticAVGModel> calculateAvgMovesPerWinner(int edition, String category);
+    List<TournamentsAnalyticsModel> calculateAvgMovesPerWinner(int edition, String category);
 
     //2: Get the list of players who participated in an edition and the number of matches they won in each category they enrolled in
     @Aggregation(pipeline = {
@@ -32,7 +31,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
             "{ $project:  {userId:  '$_id.winner', category:  '$_id.category', edition: '$_id.edition', howMany: '$wonGames'}}",
             "{ $sort: { 'edition': 1, 'category': 1, 'userId': 1 } }"
     })
-    List<TournamentsAnalyticAVGModel> countGamesWonByPlayerPerEdition(int edition, String category);
+    List<TournamentsAnalyticsModel> countGamesWonByPlayerPerEdition(int edition, String category);
 
     //3 Gets the list of all openings and for each of them calculates the percentages of victories, losses and draws they led to
     @Aggregation(pipeline = {
@@ -47,7 +46,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + "} }",
             "{ $project: {"
                     + " eco: '$_id',"
-                    + " numberOfMatches: 1,"
+                    + " numberOfMatches: '$totalMatches',"
                     + " whiteWinPercentage: {"
                     + "    $cond: { if: { $gt: ['$totalMatches', 0] },"
                     + "             then: { $multiply: [{ $divide: ['$whiteWins', '$totalMatches'] }, 100] },"
@@ -66,7 +65,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + "} }",
             "{ $sort: { 'eco': 1 } }"
     })
-    List<TournamentsAnalytic3Model> calculateAllOpeningsRates();
+    List<TournamentsAnalyticsModel> calculateAllOpeningsRates();
 
     //3 VAR: Given a certain opening calculates the percentages of victory, loss and draw it led to
     @Aggregation(pipeline = {
@@ -81,7 +80,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + "} }",
             "{ $project: {"
                     + " eco: '$_id',"
-                    + " numberOfMatches: 1,"
+                    + " numberOfMatches: '$totalMatches',"
                     + " whiteWinPercentage: {"
                     + "    $cond: { if: { $gt: ['$totalMatches', 0] },"
                     + "             then: { $multiply: [{ $divide: ['$whiteWins', '$totalMatches'] }, 100] },"
@@ -100,7 +99,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + "} }",
             "{ $sort: { 'eco': 1 } }"
     })
-    TournamentsAnalytic3Model calculateRatesByOpening(String opening);
+    TournamentsAnalyticsModel calculateRatesByOpening(String opening);
 
     //4: Given an edition, it returns for every tournament category the average number of moves matches lasted
     @Aggregation(pipeline = {
@@ -123,10 +122,10 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + " _id: 0"
                     + "} }"
     })
-    List<TournamentsAnalyticAVGModel> calculateAverageMovesPerTournament(int edition);
+    List<TournamentsAnalyticsModel> calculateAverageMovesPerTournament(int edition);
 
 
-    //5
+    //5: Given a certain edition it returns, for each category, the most frequently used opening and how many times it was used
     @Aggregation(pipeline = {
             "{ $unwind: '$RawMatches' }",
             "{ $match: { 'RawMatches.ECO': { $exists: true, $ne: '' }, 'Edition': ?0 } }",
@@ -154,9 +153,9 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + " howMany: '$maxCount'"
                     + "} }"
     })
-    List<TournamentsAnalyticAVGModel> findMostFrequentOpeningPerTournament(int edition);
+    List<TournamentsAnalyticsModel> findMostFrequentOpeningPerTournament(int edition);
 
-    //8
+    //8: Given a certain edition, for each category it returns the average match duration
     @Aggregation(pipeline = {
             "{ $unwind: '$RawMatches' }",
             "{ $match: {'Edition': ?0}}",
@@ -177,7 +176,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
                     + " averageMatchDuration: '$averageMatchDuration'"
                     + "} }"
     })
-    List<TournamentsAnalyticAVGModel> findAverageMatchDuration(int edition);
+    List<TournamentsAnalyticsModel> findAverageMatchDuration(int edition);
 
 
 }

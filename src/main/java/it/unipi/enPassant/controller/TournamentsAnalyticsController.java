@@ -1,7 +1,6 @@
 package it.unipi.enPassant.controller;
 
-import it.unipi.enPassant.model.requests.TournamentsAnalytic3Model;
-import it.unipi.enPassant.model.requests.TournamentsAnalyticAVGModel;
+import it.unipi.enPassant.model.requests.TournamentsAnalyticsModel;
 import it.unipi.enPassant.service.TournamentsAnalyticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,7 @@ public class TournamentsAnalyticsController {
                     .body("Category must be one of: Blitz, Rapid, Open");
         }
 
-        List<TournamentsAnalyticAVGModel> results = tournamentsAnalyticsService.AVGmovesPerWinner(edition, category);
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.AVGmovesPerWinner(edition, category);
 
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -49,7 +48,7 @@ public class TournamentsAnalyticsController {
                     .body("Category must be one of: Blitz, Rapid, Open");
         }
 
-        List<TournamentsAnalyticAVGModel> results = tournamentsAnalyticsService.wonMatchesPerPlayer(edition, category);
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.wonMatchesPerPlayer(edition, category);
 
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -59,8 +58,8 @@ public class TournamentsAnalyticsController {
 
     //3 Gets the list of all openings and for each of them calculates the percentages of victories, losses and draws they led to
     @GetMapping("/opening-outcome-percentages")
-    public ResponseEntity<List<TournamentsAnalytic3Model>> openingOutcomePercentages() {
-        List<TournamentsAnalytic3Model> results = tournamentsAnalyticsService.allOpeningsPercentages();
+    public ResponseEntity<List<TournamentsAnalyticsModel>> openingOutcomePercentages() {
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.allOpeningsPercentages();
 
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -70,8 +69,8 @@ public class TournamentsAnalyticsController {
 
     //3 VAR: Given a certain opening calculates the percentages of victory, loss and draw it led to
     @GetMapping("/opening-outcome-percentages/{opening}")
-    public ResponseEntity<TournamentsAnalytic3Model> openingOutcomePercentages(@PathVariable String opening) {
-        TournamentsAnalytic3Model results = tournamentsAnalyticsService.openingsPercentages(opening);
+    public ResponseEntity<TournamentsAnalyticsModel> openingOutcomePercentages(@PathVariable String opening) {
+        TournamentsAnalyticsModel results = tournamentsAnalyticsService.openingsPercentages(opening);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -81,8 +80,8 @@ public class TournamentsAnalyticsController {
 
     //4: Given an edition, it returns for every tournament category the average number of moves matches lasted
     @GetMapping("/tournament-avg-moves/{edition}")
-    public ResponseEntity<List<TournamentsAnalyticAVGModel>> openingOutcomePercentages(@PathVariable int edition) {
-        List<TournamentsAnalyticAVGModel> results = tournamentsAnalyticsService.AVGmovesPerTournament(edition);
+    public ResponseEntity<List<TournamentsAnalyticsModel>> openingOutcomePercentages(@PathVariable int edition) {
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.AVGmovesPerTournament(edition);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -90,10 +89,10 @@ public class TournamentsAnalyticsController {
         return ResponseEntity.ok(results);
     }
 
-    //5
+    //5: Given a certain edition it returns, for each category, the most frequently used opening and how many times it was used
     @GetMapping("/tournament-most-frequent-opening/{edition}")
-    public ResponseEntity<List<TournamentsAnalyticAVGModel>> TournamentMostFrequentOpening(@PathVariable int edition) {
-        List<TournamentsAnalyticAVGModel> results = tournamentsAnalyticsService.tournamentMFO(edition);
+    public ResponseEntity<List<TournamentsAnalyticsModel>> TournamentMostFrequentOpening(@PathVariable int edition) {
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.tournamentMFO(edition);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -101,9 +100,10 @@ public class TournamentsAnalyticsController {
         return ResponseEntity.ok(results);
     }
 
+    //8: Given a certain edition, for each category it returns the average match duration
     @GetMapping("/tournament-avg-match-duration/{edition}")
-    public ResponseEntity<List<TournamentsAnalyticAVGModel>> TournamentMatchAVGDuration(@PathVariable int edition) {
-        List<TournamentsAnalyticAVGModel> results = tournamentsAnalyticsService.tournamentMatchDuration(edition);
+    public ResponseEntity<List<TournamentsAnalyticsModel>> TournamentMatchAVGDuration(@PathVariable int edition) {
+        List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.tournamentMatchDuration(edition);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

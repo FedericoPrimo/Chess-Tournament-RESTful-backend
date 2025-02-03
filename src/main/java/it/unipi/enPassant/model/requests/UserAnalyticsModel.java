@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserAnalyticOpeningModel {
+public class UserAnalyticsModel {
 
     @JsonProperty("userId")
     private String userId;
@@ -16,20 +16,21 @@ public class UserAnalyticOpeningModel {
     private int howMany;
 
     // Empty Constructor
-    public UserAnalyticOpeningModel() {}
+    public UserAnalyticsModel() {}
 
     // Constructor
-    public UserAnalyticOpeningModel(String username, String mostFrequentOpening, int howMany) {
+    public UserAnalyticsModel(String username, String mostFrequentOpening, int howMany) {
         this.userId = username;
         this.mostFrequentOpening = mostFrequentOpening;
         this.howMany = howMany;
     }
-/*
-    public UserAnalyticOpeningModel(String username, int howMany) {
+
+    public UserAnalyticsModel(String username, int howMany) {
         this.userId = username;
         this.howMany = howMany;
+        this.mostFrequentOpening = null;
     }
-*/
+
     //getter & setter
     public String getUserId() {
         return userId;

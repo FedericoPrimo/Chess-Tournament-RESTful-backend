@@ -1,7 +1,6 @@
 package it.unipi.enPassant.controller;
 
-import it.unipi.enPassant.model.requests.UserAnalyticNumberModel;
-import it.unipi.enPassant.model.requests.UserAnalyticOpeningModel;
+import it.unipi.enPassant.model.requests.UserAnalyticsModel;
 import it.unipi.enPassant.service.UserAnalyticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +23,8 @@ public class UserAnalyticsController {
 
     //1: Get the list of all the players and their respective most frequently used opening
     @GetMapping("/all-most-frequent-openings")
-    public ResponseEntity<List<UserAnalyticOpeningModel>> allMostFrequentOpening() {
-        List<UserAnalyticOpeningModel> results = userAnalyticsService.getAllPlayersMFO();
+    public ResponseEntity<List<UserAnalyticsModel>> allMostFrequentOpening() {
+        List<UserAnalyticsModel> results = userAnalyticsService.getAllPlayersMFO();
 
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -35,8 +34,8 @@ public class UserAnalyticsController {
 
     //1VAR: Get a specific player's most frequently used opening
     @GetMapping("/player-most-frequent-openings/{username}")
-    public ResponseEntity<UserAnalyticOpeningModel> playerMostFrequentOpening(@PathVariable String username) {
-        UserAnalyticOpeningModel results = userAnalyticsService.getPlayersMFO(username);
+    public ResponseEntity<UserAnalyticsModel> playerMostFrequentOpening(@PathVariable String username) {
+        UserAnalyticsModel results = userAnalyticsService.getPlayersMFO(username);
         if (results==null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -53,7 +52,7 @@ public class UserAnalyticsController {
                     .body("Outcome must be one of: win, draw, loss");
         }
 
-        List<UserAnalyticOpeningModel> results = userAnalyticsService.getAllPlayersWinningMFO(outcome);
+        List<UserAnalyticsModel> results = userAnalyticsService.getAllPlayersWinningMFO(outcome);
 
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -71,7 +70,7 @@ public class UserAnalyticsController {
                     .body("Outcome must be one of: win, draw, loss");
         }
 
-        UserAnalyticOpeningModel results = userAnalyticsService.getPlayersWinningMFO(username, outcome);
+        UserAnalyticsModel results = userAnalyticsService.getPlayersWinningMFO(username, outcome);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -83,8 +82,8 @@ public class UserAnalyticsController {
 
     //3: Get the list of all the players and their respective number of defeated opponents
     @GetMapping("/number-of-defeated-opponents")
-    public ResponseEntity<List<UserAnalyticNumberModel>> allDefeatedOpponents() {
-        List<UserAnalyticNumberModel> results = userAnalyticsService.getNumberOfDefeatedOpponents();
+    public ResponseEntity<List<UserAnalyticsModel>> allDefeatedOpponents() {
+        List<UserAnalyticsModel> results = userAnalyticsService.getNumberOfDefeatedOpponents();
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -93,8 +92,8 @@ public class UserAnalyticsController {
 
     //3 VAR: Get a specific player's number of defeated opponents
     @GetMapping("/player-number-of-defeated-opponents/{username}")
-    public ResponseEntity<UserAnalyticNumberModel> playerDefeatedOpponents(@PathVariable String username) {
-        UserAnalyticNumberModel results = userAnalyticsService.getPlayerNumberOfDefeatedOpponents(username);
+    public ResponseEntity<UserAnalyticsModel> playerDefeatedOpponents(@PathVariable String username) {
+        UserAnalyticsModel results = userAnalyticsService.getPlayerNumberOfDefeatedOpponents(username);
 
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -113,7 +112,7 @@ public class UserAnalyticsController {
                     .body("Outcome must be one of: win, draw, loss");
         }
 
-        List<UserAnalyticNumberModel> results = userAnalyticsService.getNumberOfWonMatches(outcome);
+        List<UserAnalyticsModel> results = userAnalyticsService.getNumberOfWonMatches(outcome);
         if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -130,7 +129,7 @@ public class UserAnalyticsController {
                     .body("Outcome must be one of: win, draw, loss");
         }
 
-        UserAnalyticNumberModel results = userAnalyticsService.getPlayersNumberOfWonMatches(outcome, username);
+        UserAnalyticsModel results = userAnalyticsService.getPlayersNumberOfWonMatches(outcome, username);
         if (results == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }

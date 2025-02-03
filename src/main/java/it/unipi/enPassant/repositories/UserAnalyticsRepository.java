@@ -1,8 +1,7 @@
 package it.unipi.enPassant.repositories;
 
 import it.unipi.enPassant.model.requests.DocumentUser;
-import it.unipi.enPassant.model.requests.UserAnalyticNumberModel;
-import it.unipi.enPassant.model.requests.UserAnalyticOpeningModel;
+import it.unipi.enPassant.model.requests.UserAnalyticsModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -21,7 +20,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', mostFrequentOpening: 1, howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    List<UserAnalyticOpeningModel> findAllMostFrequentOpenings();
+    List<UserAnalyticsModel> findAllMostFrequentOpenings();
 
     //1 VAR: Finds the mostFrequentOpening for a specific player
     @Aggregation(pipeline = {
@@ -34,7 +33,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', mostFrequentOpening: 1, howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    UserAnalyticOpeningModel findPlayerMostFrequentOpening(String username);
+    UserAnalyticsModel findPlayerMostFrequentOpening(String username);
 
     //2: List player - mostFrequentOpening in matches they won
     @Aggregation(pipeline = {
@@ -48,7 +47,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', mostFrequentOpening: 1, howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    List<UserAnalyticOpeningModel> findAllMostFrequentWinningOpening(String outcome);
+    List<UserAnalyticsModel> findAllMostFrequentWinningOpening(String outcome);
 
     //2 VAR: Finds the mostFrequentOpening for a specific player in matches they won/lost/draw
     @Aggregation(pipeline = {
@@ -62,7 +61,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', mostFrequentOpening: 1, howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    UserAnalyticOpeningModel findPlayerMostFrequentWinningOpening(String username, String outcome);
+    UserAnalyticsModel findPlayerMostFrequentWinningOpening(String username, String outcome);
 
 
     //3: List player-number of defeated opponets
@@ -75,7 +74,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    List<UserAnalyticNumberModel> numberOfDefeatedOpponents();
+    List<UserAnalyticsModel> numberOfDefeatedOpponents();
 
     //3 VAR: Finds the number of opponents defeated by a certain player
     @Aggregation(pipeline = {
@@ -88,7 +87,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    UserAnalyticNumberModel playerNumberOfDefeatedOpponents(String username);
+    UserAnalyticsModel playerNumberOfDefeatedOpponents(String username);
 
 
     //4: List player-number of won matches
@@ -100,7 +99,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    List<UserAnalyticNumberModel> numberOfWonMatches(String outcome);
+    List<UserAnalyticsModel> numberOfWonMatches(String outcome);
 
     //4 VAR: Find a certain player's number of won/lost/draw matches
     @Aggregation(pipeline = {
@@ -111,7 +110,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
     })
-    UserAnalyticNumberModel playerNumberOfWonMatches(String outcome, String username);
+    UserAnalyticsModel playerNumberOfWonMatches(String outcome, String username);
 
 
     //5: List of disqualified players
