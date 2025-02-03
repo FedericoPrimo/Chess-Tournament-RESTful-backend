@@ -24,7 +24,12 @@ public class UserAnalyticOpeningModel {
         this.mostFrequentOpening = mostFrequentOpening;
         this.howMany = howMany;
     }
-
+/*
+    public UserAnalyticOpeningModel(String username, int howMany) {
+        this.userId = username;
+        this.howMany = howMany;
+    }
+*/
     //getter & setter
     public String getUserId() {
         return userId;

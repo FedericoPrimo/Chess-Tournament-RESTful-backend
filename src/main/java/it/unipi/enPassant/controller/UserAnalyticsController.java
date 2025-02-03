@@ -47,7 +47,6 @@ public class UserAnalyticsController {
     //2: Get the list of all the players and their respective most frequently used opening in matches they won/loss/draw
     @GetMapping("/all-most-frequent-openings/{outcome}")
     public ResponseEntity<?> allMostFrequentOpening_Winning(@PathVariable String outcome) {
-
         if (!validOutcomes.contains(outcome.toLowerCase())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

@@ -32,21 +32,9 @@ public class DataServiceTournament {
         return tournamentRepository.findTournamentMatches(edition, category, location);
     }
 
-    public List<DocumentMatch> tournamentMatchGet(String category, int edition, String location, String Black, String White) {
-        System.out.println(Black);
-        System.out.println(White);
-        System.out.println(edition);
-        System.out.println(category);
-        System.out.println(location);
-        DocumentTournament tournament = tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
-        System.out.println(tournament.getId());
-        System.out.println(tournament.getEdition());
-        System.out.println(tournament.getCategory());
-        System.out.println(tournament.getLocation());
-        System.out.println(tournament.getEntry_Closing_Date());
-
-
-        return tournament.getRawMatches();
+    public DataTournamentMatchModel tournamentMatchGet(String category, int edition, String location, String Black, String White) {
+        DataTournamentMatchModel tournament = tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
+        return tournament;
     }
 
     public MatchModel liveMatchGet(String Black,String White) {
