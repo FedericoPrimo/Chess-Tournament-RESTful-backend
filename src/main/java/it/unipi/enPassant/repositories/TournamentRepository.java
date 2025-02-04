@@ -1,6 +1,7 @@
 package it.unipi.enPassant.repositories;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DataTournamentMatchModel;
 import it.unipi.enPassant.model.requests.DocumentTournament;
-import it.unipi.enPassant.model.requests.MatchListModel;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,22 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
     @Aggregation(pipeline = {
             "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
             "{ $unwind: '$RawMatches' }",
-            "{ $match: { 'RawMatches.White': ?3, 'RawMatches.Black': ?4 } }"
+            "{ $match: { 'RawMatches.White': ?4, 'RawMatches.Black': ?3 } }",
+            "{ $project: {"
+                    + " _id: 0,"
+                    + " edition: '$Edition',"
+                    + " category: '$Category',"
+                    + " location: '$Location',"
+                    + " matchDate: '$RawMatches.Date',"
+                    + " whitePlayer: '$RawMatches.White',"
+                    + " whiteElo: '$RawMatches.WhiteElo',"
+                    + " blackPlayer: '$RawMatches.Black',"
+                    + " blackElo: '$RawMatches.BlackElo',"
+                    + " eco: '$RawMatches.ECO',"
+                    + " event: '$RawMatches.Event',"
+                    + " result: '$RawMatches.Result',"
+                    + " moveList: '$RawMatches.Moves'"
+                    + "} }"
     })
-    DocumentTournament findMatchofTournament(int edition, String category, String location, String Black, String White);
+    DataTournamentMatchModel findMatchofTournament(int edition, String category, String location, String Black, String White);
 }
