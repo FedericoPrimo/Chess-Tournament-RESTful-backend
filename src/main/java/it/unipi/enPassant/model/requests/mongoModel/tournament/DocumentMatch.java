@@ -1,4 +1,5 @@
-package it.unipi.enPassant.model.requests.mongoModel.tournament;
+package it.unipi.enPassant.model.requests;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Document
 public class DocumentMatch {
-
     private int Date;
     private String White;
     private int WhiteElo;
