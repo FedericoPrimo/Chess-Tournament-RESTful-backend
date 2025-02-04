@@ -1,4 +1,4 @@
-package it.unipi.enPassant.repository;
+package it.unipi.enPassant.model.requests;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,8 +1,5 @@
 package it.unipi.enPassant.controller;
 
-
-
-import it.unipi.enPassant.model.requests.LoginRequest;
 import it.unipi.enPassant.model.requests.PlayerRequestModel;
 import it.unipi.enPassant.model.requests.LoginModel;
 import it.unipi.enPassant.service.AuthenticationService;
