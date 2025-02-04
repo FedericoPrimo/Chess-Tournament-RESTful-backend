@@ -1,10 +1,7 @@
 package it.unipi.enPassant.repositories;
-import it.unipi.enPassant.model.requests.DataUserModel;
-import it.unipi.enPassant.model.requests.DocumentTournament;
-import it.unipi.enPassant.model.requests.DocumentUser;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

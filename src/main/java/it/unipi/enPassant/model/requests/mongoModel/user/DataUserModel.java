@@ -1,9 +1,8 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.mongoModel.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDate;
 
 @Setter
 @Getter

@@ -1,5 +1,7 @@
-package it.unipi.enPassant.service;
-import it.unipi.enPassant.model.requests.*;
+package it.unipi.enPassant.service.mongoService;
+import it.unipi.enPassant.model.requests.mongoModel.user.DataUserModel;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
+import it.unipi.enPassant.model.requests.mongoModel.user.StatsModel;
 import it.unipi.enPassant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

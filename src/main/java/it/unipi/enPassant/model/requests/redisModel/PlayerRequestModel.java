@@ -1,4 +1,4 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.redisModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

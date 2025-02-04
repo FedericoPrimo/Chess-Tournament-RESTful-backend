@@ -1,6 +1,6 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.*;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.*;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,6 @@ public class DataServiceTournament {
                 .collect(Collectors.toList());
     }
 
-    public List<MatchListModel> liveMatchGetList() {
-        return List.of(
-                new MatchListModel("white","black"),
-                new MatchListModel("matti","fede")
-        );
-    }
-
     public List<MatchListModel> tournamentMatchGetList(String category,int edition,String location) {
         return tournamentRepository.findTournamentMatches(edition, category, location);
     }
@@ -35,24 +28,5 @@ public class DataServiceTournament {
     public DataTournamentMatchModel tournamentMatchGet(String category, int edition, String location, String Black, String White) {
         DataTournamentMatchModel tournament = tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
         return tournament;
-    }
-
-    public MatchModel liveMatchGet(String Black,String White) {
-        List<String> moves = List.of("e4", "e5", "Nf3", "Nc6", "Bb5", "a6");
-        return new MatchModel(
-                2024,            // Data del match
-                White,           // Giocatore bianco passato come parametro
-                2286,            // Elo bianco (dato fittizio)
-                Black,           // Giocatore nero passato come parametro
-                2664,            // Elo nero (dato fittizio)
-                "C62",           // Codice apertura
-                "The 8 Champions", // Nome evento
-                "1-0",           // Risultato
-                "Blitz",         // Categoria
-                moves,           // Lista delle mosse
-                White,           // Vincitore (ipotizziamo il bianco)
-                "2024-03-22 01:08:28", // Timestamp
-                1.45             // Durata del match
-        );
     }
 }
