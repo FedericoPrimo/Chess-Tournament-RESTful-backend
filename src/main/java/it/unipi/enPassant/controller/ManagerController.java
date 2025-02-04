@@ -25,8 +25,8 @@ public class ManagerController extends GenericUserController{
   private final ManagerService managerService;
   // Constructor for the ManagerController
   @Autowired
-  public ManagerController(AuthenticationService authservice, DataService dataservice, AuthenticationManager authenticationManager, ManagerService managerService){
-    super(authservice, dataservice, authenticationManager);
+  public ManagerController(AuthenticationService authservice, DataService dataservice, ManagerService managerService){
+    super(authservice, dataservice);
     this.managerService= managerService;
   }
 

@@ -18,7 +18,7 @@ public class SpectatorController extends GenericUserController{
 
   // Constructor for the SpectatorController
   @Autowired
-  public SpectatorController(AuthenticationService authservice, DataService dataservice, AuthenticationManager authenticationManager){
-    super(authservice, dataservice, authenticationManager);
+  public SpectatorController(AuthenticationService authservice, DataService dataservice){
+    super(authservice, dataservice);
   }
 }

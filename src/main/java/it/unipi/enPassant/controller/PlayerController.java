@@ -19,8 +19,8 @@ public class PlayerController extends GenericUserController {
 
   // Constructor for the PlayerController
   @Autowired
-  public PlayerController(AuthenticationService authservice, DataService dataservice, AuthenticationManager authenticationManager, PlayerService playerService) {
-    super(authservice, dataservice, authenticationManager);
+  public PlayerController(AuthenticationService authservice, DataService dataservice, PlayerService playerService) {
+    super(authservice, dataservice);
     this.playerService = playerService;
   }
 

@@ -27,7 +27,10 @@ public class AuthenticationService implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     // Find username in mongo and return the UserEntity associated
     DocumentUser user = userRepository.findByUsername(username);
-            // .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    if (user == null) {
+      throw new UsernameNotFoundException("User not found");
+    }
+
     // Spring Security uses Authorities to check if a user has the right to access a certain endpoint
     String role = user.getType();
     List<String> rolelist = Arrays.asList(role.split(","));

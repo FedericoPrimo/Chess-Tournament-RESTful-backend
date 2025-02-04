@@ -1,4 +1,4 @@
-package it.unipi.enPassant.security;
+package it.unipi.enPassant.config;
 
 import it.unipi.enPassant.service.AuthenticationService;
 import org.springframework.context.annotation.Bean;
@@ -31,13 +31,15 @@ public class SecurityConfig {
           PasswordEncoder passwordEncoder,
           AuthenticationService userDetailsService) throws Exception {
 
-    return http
-            .getSharedObject(AuthenticationManagerBuilder.class)
+    AuthenticationManagerBuilder authManagerBuilder =
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+    authManagerBuilder
             .userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder)
-            .and()
-            .build();
+            .passwordEncoder(passwordEncoder);
+    return authManagerBuilder.build();
+
   }
+  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
             // Disable CSRF protection since our service is stateless
