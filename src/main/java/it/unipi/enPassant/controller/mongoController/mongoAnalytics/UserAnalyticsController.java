@@ -1,7 +1,7 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController.mongoAnalytics;
 
-import it.unipi.enPassant.model.requests.UserAnalyticsModel;
-import it.unipi.enPassant.service.UserAnalyticsService;
+import it.unipi.enPassant.model.requests.mongoModel.user.UserAnalyticsModel;
+import it.unipi.enPassant.service.mongoService.UserAnalyticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

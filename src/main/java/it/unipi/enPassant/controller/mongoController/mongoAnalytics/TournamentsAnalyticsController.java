@@ -1,7 +1,7 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.mongoController.mongoAnalytics;
 
-import it.unipi.enPassant.model.requests.TournamentsAnalyticsModel;
-import it.unipi.enPassant.service.TournamentsAnalyticsService;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentsAnalyticsModel;
+import it.unipi.enPassant.service.mongoService.TournamentsAnalyticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

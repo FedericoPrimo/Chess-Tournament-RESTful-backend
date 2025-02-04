@@ -1,6 +1,6 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.UserAnalyticsModel;
+import it.unipi.enPassant.model.requests.mongoModel.user.UserAnalyticsModel;
 import it.unipi.enPassant.repositories.UserAnalyticsRepository;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package it.unipi.enPassant.service;
+package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.TournamentsAnalyticsModel;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentsAnalyticsModel;
 import it.unipi.enPassant.repositories.TournamentsAnalyticsRepository;
 import org.springframework.stereotype.Service;
 

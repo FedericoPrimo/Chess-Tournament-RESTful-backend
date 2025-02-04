@@ -1,7 +1,7 @@
 package it.unipi.enPassant.repositories;
 
-import it.unipi.enPassant.model.requests.DocumentUser;
-import it.unipi.enPassant.model.requests.UserAnalyticsModel;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
+import it.unipi.enPassant.model.requests.mongoModel.user.UserAnalyticsModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
