@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
-
+import org.bson.Document;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/appUpdate")
@@ -106,23 +104,10 @@ public class FromRedisToMongoController {
         }
     }
 
-    // Some getter
-    public List<String> getBlitzPlayers() {
-        return blitzPlayers;
-    }
-
-    public List<String> getOpenPlayers() {
-        return openPlayers;
-    }
-
-    public List<String> getRapidPlayers() {
-        return rapidPlayers;
-    }
-
     // This is one of the main function called by the getMapping
     // the player that are enrolled are putted into the tournament document.
     // In this way when the submission to the tournament are ended the manager can create the maindraw.
-    //thi function use the ausiliar function tournamentExists, isRegistrationOpen createTournament and
+    //this function use the ausiliar function tournamentExists, isRegistrationOpen createTournament and
     // addPlayersToTournament in order to keep the code as much modular as possible
     private void manageTournamentRegistration(String category, List<String> players) {
         int currentYear = LocalDate.now().getYear();
@@ -177,10 +162,12 @@ public class FromRedisToMongoController {
         mongoTemplate.updateFirst(query, update, "tournaments");
     }
 
-    // This is the other core part of the getMapping. The aims is to insert the live match already ends in the DocumentDB
-    // in this way they could be stored and we can flush the KeyValue DB without losing information.
-    // Some System.out were addd in order to improve the readability of the code in the execution phase.
-    public void updateTournamentsWithLiveMatches() {
+    // This is the other core part of the getMapping. The aims are to insert the live match already ends in the DocumentDB
+    // in this way they could be stored , we can flush the KeyValue DB without losing information.
+    // Some System.out were add in order to improve the readability of the code in the execution phase.
+    //this function use the ausiliar function calculateDuration(), retrieveUserInformation() and updateUserInformation()
+    // in order to keep the code as much modular as possible
+    private void updateTournamentsWithLiveMatches() {
         System.out.println("Retrieve Live Matches from Redis");
         List<String> liveMatches = liveMatchService.getLiveMatches();
 
@@ -191,6 +178,7 @@ public class FromRedisToMongoController {
 
         List<DocumentMatch> newRawMatches = new ArrayList<>();
         int currentYear = Year.now().getValue();
+        String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         for (String matchId : liveMatches) {
             // Here we manage every Live Match separetly
@@ -199,7 +187,8 @@ public class FromRedisToMongoController {
             System.out.println(matchId);
             String category = matchDetails.get("category");
             String startingTime = matchDetails.get("startingTime");
-
+            String endTime = matchDetails.get("endTime");
+            String winner = matchDetails.get("winner");
 
             List<String> movesList = liveMatchService.retrieveMovesList(matchId);
 
@@ -223,6 +212,26 @@ public class FromRedisToMongoController {
             System.out.println(startingTime);
             match.setMoves(movesList);
             System.out.println(movesList);
+            match.setDate(currentYear);
+            System.out.println(currentYear);
+            match.setWinner(winner);
+            System.out.println(winner);
+
+            int whiteelo = retrieveELOUserInformation(users[0]);
+            match.setWhiteElo(whiteelo);
+            System.out.println(whiteelo);
+
+            int blackelo = retrieveELOUserInformation(users[1]);
+            match.setBlackElo(blackelo);
+            System.out.println(blackelo);
+
+            String result = computeResult(users[0],users[1],winner);
+            match.setResult(result);
+            System.out.println(result);
+
+            if (startingTime != null && endTime != null) {
+                match.setDuration(calculateDuration(startingTime, endTime));
+            }
 
             newRawMatches.add(match);
 
@@ -245,6 +254,35 @@ public class FromRedisToMongoController {
             } else {
                 System.out.println("There is no Tournament for this category: " + category);
             }
+            updateUserInformation();
         }
+
     }
+
+    private double calculateDuration(String start, String end) { //* modificato per restituire un double
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss"); //* aggiunto per formattare l'orario
+        LocalTime startTime = LocalTime.parse(start, formatter);
+        LocalTime endTime = LocalTime.parse(end, formatter);
+
+        return java.time.Duration.between(startTime, endTime).toMinutes(); //* calcola la durata in minuti come double
+    }
+
+    private String computeResult(String white, String black, String winner) {
+        if(Objects.equals(white, winner)) return "1-0";
+        else if (Objects.equals(black, winner)) return "0-1";
+        else return "0.5-0.5";
+    }
+
+    private int retrieveELOUserInformation(String user) {
+        Query query = new Query(Criteria.where("_id").is(user));
+        Document userDoc = mongoTemplate.findOne(query, Document.class, "user");
+
+        if (userDoc != null && userDoc.containsKey("ELO")) {
+            return userDoc.getInteger("ELO");
+        }
+
+        return 0;
+    }
+
+    private void updateUserInformation(){}
 }
