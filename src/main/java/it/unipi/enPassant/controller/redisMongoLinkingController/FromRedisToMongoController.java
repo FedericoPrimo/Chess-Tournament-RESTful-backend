@@ -1,4 +1,4 @@
-package it.unipi.enPassant.controller;
+package it.unipi.enPassant.controller.redisMongoLinkingController;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.repositories.TournamentRepository;
@@ -27,6 +27,7 @@ import java.util.Set;
 @RequestMapping("api/appUpdate")
 public class FromRedisToMongoController {
 
+    // 1.initialize the class
     @Autowired
     private RequestService requestService;
 
@@ -50,9 +51,7 @@ public class FromRedisToMongoController {
 
     @GetMapping
     public void appUpdate() {
-        // 1. Reset request Queue
-        // -> gestito nel punto 5:)
-        // 2. Get disqualified players and update MongoDB
+        // 2. Get disqualified players and update MongoDB player status
         Set<Object> disqualified = managePlayerService.getAllDisqualifiedPlayers();
         for (Object user : disqualified) {
             if (user instanceof String userId) {
@@ -80,7 +79,7 @@ public class FromRedisToMongoController {
         // 4. Get live match
         updateTournamentsWithLiveMatches();
 
-        // 5. Flush DB
+        // 5. Flush Key Value DB the information that contains now are  no more rilevant
         try (Jedis jedis = new Jedis("localhost", 6379)) {
             jedis.flushDB(); // Cancella il database attuale di Redis
             System.out.println("Redis database flushed.");
@@ -89,6 +88,7 @@ public class FromRedisToMongoController {
         }
     }
 
+    // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
     private void categorizePlayers(Map<Object, Object> enrolled) {
         blitzPlayers = new ArrayList<>();
         openPlayers = new ArrayList<>();
@@ -106,6 +106,7 @@ public class FromRedisToMongoController {
         }
     }
 
+    // Some getter
     public List<String> getBlitzPlayers() {
         return blitzPlayers;
     }
@@ -118,23 +119,26 @@ public class FromRedisToMongoController {
         return rapidPlayers;
     }
 
+    // This is one of the main function called by the getMapping
+    // the player that are enrolled are putted into the tournament document.
+    // In this way when the submission to the tournament are ended the manager can create the maindraw.
+    //thi function use the ausiliar function tournamentExists, isRegistrationOpen createTournament and
+    // addPlayersToTournament in order to keep the code as much modular as possible
     private void manageTournamentRegistration(String category, List<String> players) {
         int currentYear = LocalDate.now().getYear();
-
-        // 1. Controlla se il torneo dell'anno corrente esiste
+        // check the existence of the tournaments
         if (!tournamentExists(currentYear, category)) {
             createTournament(currentYear, category);
             addPlayersToTournament(currentYear, category, players);
             return;
         }
-
-        // 2. Controlla se le iscrizioni sono ancora aperte
+        // check the entry closing date
         if (isRegistrationOpen(currentYear, category)) {
             addPlayersToTournament(currentYear, category, players);
             return;
         }
 
-        // 3. Se le iscrizioni sono chiuse, gestisci il torneo per l'anno successivo
+        // if submission were closed the submission is good for the next year
         int nextYear = currentYear + 1;
         if (!tournamentExists(nextYear, category)) {
             createTournament(nextYear, category);
@@ -154,7 +158,7 @@ public class FromRedisToMongoController {
         DocumentTournament tournament = mongoTemplate.findOne(query, DocumentTournament.class);
 
         if (tournament == null || tournament.getEntry_Closing_Date() == null || tournament.getEntry_Closing_Date().isEmpty()) {
-            return true; // Se il torneo non esiste o la data è vuota, consideriamo le iscrizioni aperte
+            return true;
         }
 
         return LocalDate.now().isBefore(LocalDate.parse(tournament.getEntry_Closing_Date().substring(0, 10), FORMATTER));
@@ -173,12 +177,15 @@ public class FromRedisToMongoController {
         mongoTemplate.updateFirst(query, update, "tournaments");
     }
 
+    // This is the other core part of the getMapping. The aims is to insert the live match already ends in the DocumentDB
+    // in this way they could be stored and we can flush the KeyValue DB without losing information.
+    // Some System.out were addd in order to improve the readability of the code in the execution phase.
     public void updateTournamentsWithLiveMatches() {
-        System.out.println("🔎 Recupero dei match live da Redis...");
+        System.out.println("Retrieve Live Matches from Redis");
         List<String> liveMatches = liveMatchService.getLiveMatches();
 
         if (liveMatches.isEmpty()) {
-            System.out.println("⚠ Nessun match live trovato.");
+            System.out.println("No Live Matches found!");
             return;
         }
 
@@ -186,30 +193,30 @@ public class FromRedisToMongoController {
         int currentYear = Year.now().getValue();
 
         for (String matchId : liveMatches) {
-            // Recupero i dettagli del match
+            // Here we manage every Live Match separetly
             Map<String, String> matchDetails = liveMatchService.getMatchDetails(matchId);
             if (matchDetails.isEmpty()) continue;
             System.out.println(matchId);
             String category = matchDetails.get("category");
             String startingTime = matchDetails.get("startingTime");
 
-            // Recupero la lista delle mosse
+
             List<String> movesList = liveMatchService.retrieveMovesList(matchId);
 
-            // Creazione dell'oggetto DocumentMatch
+
             DocumentMatch match = new DocumentMatch();
 
-            // Parsing del matchId per ottenere user1 (bianco) e user2 (nero)
+            // Retrieve White and Black by matchId that by convection is user1-user2
             String[] users = matchId.split("-");
 
             if (users.length == 2) {
                 match.setWhite(users[0]); // White player
                 match.setBlack(users[1]); // Black player
             } else {
-                System.out.println("⚠ Errore nel parsing del matchId: " + matchId);
-                return; // Evita di aggiungere un match corrotto
+                System.out.println("MatchId is a wrong format: " + matchId);
+                continue;
             }
-
+            // Some print in order to help in case of debug or something goes wrong (Hopefully, these prints are only aesthetics  )
             match.setCategory(category);
             System.out.println(category);
             match.setTimestamp(startingTime);
@@ -219,26 +226,24 @@ public class FromRedisToMongoController {
 
             newRawMatches.add(match);
 
-            // **Ricerca del torneo corrispondente**
+            // Retrive the Tournament in which make the insert of the match
             Query query = new Query();
             query.addCriteria(Criteria.where("Edition").is(currentYear).and("Category").is(category));
 
             DocumentTournament tournament = mongoTemplate.findOne(query, DocumentTournament.class);
 
             if (tournament != null) {
-                // Inizializza rawMatches se necessario
+
                 if (tournament.getRawMatches() == null) {
                     tournament.setRawMatches(new ArrayList<>());
                 }
 
-                // Aggiunge il match alla lista dei rawMatches
                 tournament.getRawMatches().add(match);
 
-                // Salva l'aggiornamento
                 repository.save(tournament);
-                System.out.println("✅ Aggiunto match live " + matchId + " al torneo " + category);
+                System.out.println("Live match " + matchId + " added succesfully in  " + category);
             } else {
-                System.out.println("⚠ Nessun torneo trovato per categoria: " + category);
+                System.out.println("There is no Tournament for this category: " + category);
             }
         }
     }
