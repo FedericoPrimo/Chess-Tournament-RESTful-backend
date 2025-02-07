@@ -189,6 +189,7 @@ public class FromRedisToMongoController {
             String startingTime = matchDetails.get("startingTime");
             String endTime = matchDetails.get("endTime");
             String winner = matchDetails.get("winner");
+            String ECO = matchDetails.get("ECO");
 
             List<String> movesList = liveMatchService.retrieveMovesList(matchId);
 
@@ -216,6 +217,8 @@ public class FromRedisToMongoController {
             System.out.println(currentYear);
             match.setWinner(winner);
             System.out.println(winner);
+            match.setEco(ECO);
+            System.out.println(ECO);
 
             int whiteelo = retrieveELOUserInformation(users[0]);
             match.setWhiteElo(whiteelo);
@@ -254,7 +257,7 @@ public class FromRedisToMongoController {
             } else {
                 System.out.println("There is no Tournament for this category: " + category);
             }
-            updateUserInformation();
+            updateUserInformation(match);
         }
 
     }
@@ -284,5 +287,85 @@ public class FromRedisToMongoController {
         return 0;
     }
 
-    private void updateUserInformation(){}
+    private void updateUserInformation(DocumentMatch match) {
+        String whitePlayerId = match.getWhite();
+        String blackPlayerId = match.getBlack();
+        String winner = match.getWinner();
+        String opening = match.getEco();
+        int numberOfMoves = match.getMoves().size();
+        int tournamentEdition = match.getDate();
+        String tournamentCategory = match.getCategory();
+
+        System.out.println("updateUserInformation called with:");
+        System.out.println("White Player: " + whitePlayerId);
+        System.out.println("Black Player: " + blackPlayerId);
+        System.out.println("Winner: " + winner);
+        System.out.println("Opening: " + opening);
+        System.out.println("Number of Moves: " + numberOfMoves);
+        System.out.println("Tournament Edition: " + tournamentEdition);
+        System.out.println("Tournament Category: " + tournamentCategory);
+
+        updateUserMatchRecord(whitePlayerId, "White", numberOfMoves, winner, opening, blackPlayerId, tournamentEdition, tournamentCategory);
+        updateUserMatchRecord(blackPlayerId, "Black", numberOfMoves, winner, opening, whitePlayerId, tournamentEdition, tournamentCategory);
+    }
+
+    private void updateUserMatchRecord(String userId, String color, int numberOfMoves, String winner, String opening, String opponentId, int tournamentEdition, String tournamentCategory) {
+        System.out.println("updateUserMatchRecord called with:");
+        System.out.println("User ID: " + userId);
+        System.out.println("Color: " + color);
+        System.out.println("Number of Moves: " + numberOfMoves);
+        System.out.println("Winner: " + winner);
+        System.out.println("Opening: " + opening);
+        System.out.println("Opponent ID: " + opponentId);
+        System.out.println("Tournament Edition: " + tournamentEdition);
+        System.out.println("Tournament Category: " + tournamentCategory);
+
+        Query query = new Query(Criteria.where("_id").is(userId));
+
+        Document matchRecord = new Document();
+        matchRecord.put("Color", color);
+        matchRecord.put("NumberOfMoves", numberOfMoves);
+        matchRecord.put("Winner", winner);
+        matchRecord.put("Opening", opening);
+        matchRecord.put("OpponentId", opponentId);
+        matchRecord.put("TournamentEdition", tournamentEdition);
+        matchRecord.put("TournamentCategory", tournamentCategory);
+
+        Update update = new Update().push("Matches", matchRecord);
+
+        // Update user statistics
+        update.inc("NumberOfPlayedMatches", 1);
+        if (winner.equals(userId)) {
+            update.inc("NumberOfVictories", 1);
+            update.inc("ELO", 50);
+        } else if (winner.equals("draw")) {
+            update.inc("NumberOfDraw", 1);
+        } else {
+            update.inc("NumberOfDefeats", 1);
+            update.inc("ELO", -50);
+        }
+
+
+        Query queryavg = new Query(Criteria.where("_id").is(userId));
+        Document userDoc = mongoTemplate.findOne(queryavg, Document.class, "user");
+
+        int totalMoves = userDoc != null && userDoc.containsKey("Matches")
+                ? ((List<Document>) userDoc.get("Matches")).stream()
+                .mapToInt(m -> m.getInteger("NumberOfMoves", 0))
+                .sum()
+                : 0;
+
+        int totalMatches = userDoc != null && userDoc.containsKey("NumberOfPlayedMatches")
+                ? userDoc.getInteger("NumberOfPlayedMatches", 0)
+                : 0;
+
+        double avgMoves = (totalMatches > 0) ? (double) totalMoves / totalMatches : 0;
+        Update updateavg = new Update().set("avgMovesNumber", avgMoves);
+        mongoTemplate.updateFirst(queryavg, updateavg, "user");
+
+
+        mongoTemplate.updateFirst(query, update, "user");
+    }
+
+
 }

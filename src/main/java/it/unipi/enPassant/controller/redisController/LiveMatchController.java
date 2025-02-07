@@ -78,9 +78,9 @@ public class LiveMatchController {
         return ResponseEntity.ok("Matches submitted successfully.");
     }
 
-    @PostMapping("/insertMatchResult/{matchId}/{winner}")
-    public ResponseEntity<String> insertMatchResult(@PathVariable String matchId, @PathVariable String winner) {
-        liveMatchService.insertMatchResult(matchId, winner);
+    @PostMapping("/insertMatchResult/{matchId}/{winner}/{ECO}")
+    public ResponseEntity<String> insertMatchResult(@PathVariable String matchId, @PathVariable String winner, @PathVariable String ECO) {
+        liveMatchService.insertMatchResult(matchId, winner,ECO);
         return ResponseEntity.ok("Match Result of  " + matchId + " inserted successfully.");
     }
 }
