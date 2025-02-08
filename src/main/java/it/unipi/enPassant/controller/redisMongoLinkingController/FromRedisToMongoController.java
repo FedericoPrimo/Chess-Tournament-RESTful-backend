@@ -220,13 +220,13 @@ public class FromRedisToMongoController {
             match.setEco(ECO);
             System.out.println(ECO);
 
-            int whiteelo = retrieveELOUserInformation(users[0]);
+            /*int whiteelo = retrieveELOUserInformation(users[0]);
             match.setWhiteElo(whiteelo);
             System.out.println(whiteelo);
 
             int blackelo = retrieveELOUserInformation(users[1]);
             match.setBlackElo(blackelo);
-            System.out.println(blackelo);
+            System.out.println(blackelo);*/
 
             String result = computeResult(users[0],users[1],winner);
             match.setResult(result);
