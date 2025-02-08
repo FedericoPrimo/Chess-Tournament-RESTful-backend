@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class DocumentMatchUser {
     private String Color;
     private int NumberOfMoves;
-    private String Winner;
+    private String Outcome;
     private String Opening;
     private String OpponentId;
     private int TournamentEdition;
@@ -15,10 +15,10 @@ public class DocumentMatchUser {
     public DocumentMatchUser() {}
 
     // Costruttore completo
-    public DocumentMatchUser(String Color, int NumberOfMoves, String Winner, String Opening, String OpponentId, int TournamentEdition, String TournamentCategory) {
+    public DocumentMatchUser(String Color, int NumberOfMoves, String Outcome, String Opening, String OpponentId, int TournamentEdition, String TournamentCategory) {
         this.Color = Color;
         this.NumberOfMoves = NumberOfMoves;
-        this.Winner = Winner;
+        this.Outcome = Outcome;
         this.Opening = Opening;
         this.OpponentId = OpponentId;
         this.TournamentEdition = TournamentEdition;
@@ -42,12 +42,12 @@ public class DocumentMatchUser {
         this.NumberOfMoves = NumberOfMoves;
     }
 
-    public String getWinner() {
-        return Winner;
+    public String getOutcome() {
+        return Outcome;
     }
 
-    public void setWinner(String Winner) {
-        this.Winner = Winner;
+    public void setOutcome(String Outcome) {
+        this.Outcome = Outcome;
     }
 
     public String getOpening() {

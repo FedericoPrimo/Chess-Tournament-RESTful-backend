@@ -18,20 +18,11 @@ public class MatchModel {
     @JsonProperty("white")
     private String whitePlayer;
 
-    @JsonProperty("whiteElo")
-    private int whiteElo;
-
     @JsonProperty("black")
     private String blackPlayer;
 
-    @JsonProperty("blackElo")
-    private int blackElo;
-
     @JsonProperty("eco")
     private String eco;
-
-    @JsonProperty("event")
-    private String event;
 
     @JsonProperty("result")
     private String result;
@@ -55,16 +46,13 @@ public class MatchModel {
     public MatchModel() {}
 
     // Costruttore con parametri
-    public MatchModel(int date, String whitePlayer, int whiteElo, String blackPlayer, int blackElo,
-                      String eco, String event, String result, String category, List<String> moves,
+    public MatchModel(int date, String whitePlayer, String blackPlayer,
+                      String eco, String result, String category, List<String> moves,
                       String winner, String timestamp, double duration) {
         this.date = date;
         this.whitePlayer = whitePlayer;
-        this.whiteElo = whiteElo;
         this.blackPlayer = blackPlayer;
-        this.blackElo = blackElo;
         this.eco = eco;
-        this.event = event;
         this.result = result;
         this.category = category;
         this.moves = moves;

@@ -29,9 +29,9 @@ public class ManagePlayerController {
     @GetMapping("/disqualified/{playerId}")
     public String isPlayerDisqualified(@PathVariable String playerId) {
        if(managePlayerService.isPlayerDisqualified(playerId))
-           return "Player" + playerId + " is disqualified.";
+           return "Player " + playerId + " is disqualified.";
        else
-           return "Player" + playerId + " is not disqualified.";
+           return "Player " + playerId + " is not disqualified.";
     }
 
     @GetMapping("/disqualifiedList")
@@ -55,9 +55,9 @@ public class ManagePlayerController {
     @GetMapping("/register/{playerId}")
     public String isPlayerRegistered(@PathVariable String playerId) {
         if(managePlayerService.isPlayerRegistered(playerId))
-            return "Player" + playerId + " is enrolled.";
+            return "Player " + playerId + " is enrolled.";
         else
-            return "Player" + playerId + " is not enrolled.";
+            return "Player " + playerId + " is not enrolled.";
     }
 
     @GetMapping("/registerList")

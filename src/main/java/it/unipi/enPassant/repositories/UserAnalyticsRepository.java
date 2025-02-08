@@ -39,7 +39,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { 'Matches.Winner': ?0 } }",
+            "{ $match: { 'Matches.Outcome': ?0 } }",
             "{ $project: { userId: '$_id', opening: '$Matches.Opening'} }",
             "{ $group: { _id: { userId: '$userId', opening: '$opening' }, count: { $sum: 1 } } }",
             "{ $sort: { count: -1 } }",
@@ -53,7 +53,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { '_id': ?0, 'Matches.Winner': ?1 } }",
+            "{ $match: { '_id': ?0, 'Matches.Outcome': ?1 } }",
             "{ $project: { userId: '$_id', opening: '$Matches.Opening' } }",
             "{ $group: { _id: { userId: '$userId', opening: '$opening' }, count: { $sum: 1 } } }",
             "{ $sort: { count: -1 } }",
@@ -68,7 +68,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { 'Matches.Winner': 'win' } }",
+            "{ $match: { 'Matches.Outcome': 'win' } }",
             "{ $group: { _id: { userId: '$_id', opponentId: '$Matches.OpponentId' } } }",
             "{ $group: { _id: '$_id.userId', howMany: { $sum: 1 } } }",
             "{ $project: { userId: '$_id', howMany: 1 } }",
@@ -80,7 +80,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { '_id': ?0, 'Matches.Winner': 'win' } }",
+            "{ $match: { '_id': ?0, 'Matches.Outcome': 'win' } }",
             "{ $project: { userId: '$_id', opponentId: '$Matches.OpponentId'}}",
             "{ $group: { _id: { userId: '$userId', opponentId: '$opponentId'}, totalOpponents: { $sum: 1 } } }",
             "{ $group: { _id: '$_id.userId', howMany: { $sum: 1 } } }",
@@ -94,7 +94,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { 'Matches.Winner': ?0 } }",
+            "{ $match: { 'Matches.Outcome': ?0 } }",
             "{ $group: { _id: '$_id', howMany: { $sum: 1 } } }",
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
@@ -105,7 +105,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
     @Aggregation(pipeline = {
             "{ $match: { 'Type': '1' } }",
             "{ $unwind: '$Matches' }",
-            "{ $match: { '_id': ?1, 'Matches.Winner': ?0 } }",
+            "{ $match: { '_id': ?1, 'Matches.Outcome': ?0 } }",
             "{ $group: { _id: '$_id', howMany: { $sum: 1 } } }",
             "{ $project: { userId: '$_id', howMany: 1 } }",
             "{ $sort: { 'userId': 1 } }"
