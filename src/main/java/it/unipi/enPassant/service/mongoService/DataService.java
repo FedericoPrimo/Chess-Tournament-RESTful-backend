@@ -39,6 +39,13 @@ public class DataService {
     public StatsModel dataGetPlayerStats(String username) {
         DocumentUser user = userRepository.findByUsername(username);
         System.out.println(user);
-        return new StatsModel( user.getELO());
+        return new StatsModel(
+                user.getELO(),
+                user.getNumberOfPlayedMatches(),
+                user.getNumberOfVictories(),
+                user.getNumberOfDefeats(),
+                user.getNumberOfDraws(),
+                user.getAvgMovesNumber()
+        );
     }
 }
