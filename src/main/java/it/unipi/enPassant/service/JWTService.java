@@ -1,5 +1,6 @@
 package it.unipi.enPassant.service;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
@@ -14,6 +15,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JWTService {
@@ -45,8 +47,40 @@ public class JWTService {
             .compact();
   }
 
-  private static Key getKey(){
+  private static SecretKey getKey(){
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
+  }
+
+  public static boolean validateToken(String token) {
+    try {
+      final String username = extractUsername(token);
+      return !isTokenExpired(token);
+    } catch (Exception e) {
+      return false; // Invalid token
+    }
+  }
+  public static  String extractUsername(String token) {
+    return extractClaim(token, Claims::getSubject);
+  }
+  private static <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    final Claims claims = extractAllClaims(token);
+    return claimResolver.apply(claims);
+  }
+
+  private static Claims extractAllClaims(String token) {
+    return Jwts.parser()
+            .verifyWith(getKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+  }
+
+  private static boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(new Date());
+  }
+
+  private static Date extractExpiration(String token) {
+    return extractClaim(token, Claims::getExpiration);
   }
 }

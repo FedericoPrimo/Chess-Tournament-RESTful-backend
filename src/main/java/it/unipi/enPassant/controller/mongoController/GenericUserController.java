@@ -1,18 +1,23 @@
 package it.unipi.enPassant.controller.mongoController;
 
+import it.unipi.enPassant.controller.mongoController.mongoCRUD.CRUDcontrollerUser;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.model.requests.mongoModel.user.StatsModel;
 import it.unipi.enPassant.model.requests.mongoModel.user.DataUserModel;
 import it.unipi.enPassant.model.requests.LoginModel;
 import it.unipi.enPassant.service.AuthenticationService;
 import it.unipi.enPassant.service.mongoService.DataService;
 import it.unipi.enPassant.service.JWTService;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /* Abstract class, not a spring bean so it must be called by its child*/
 public abstract class GenericUserController {
@@ -31,6 +37,8 @@ public abstract class GenericUserController {
   private AuthenticationManager authenticationManager;
   @Autowired
   private JWTService jwtService;
+  @Autowired
+  private CRUDcontrollerUser crudControllerUser;
 
   protected GenericUserController(AuthenticationService authservice, DataService dataservice) {
     this.authservice = authservice;
@@ -57,6 +65,22 @@ public abstract class GenericUserController {
     }
     catch (BadCredentialsException e) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    }
+    catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/register")
+  protected ResponseEntity<String> register(@RequestBody DocumentUser userModel) {
+    try {
+      // Check if the user already exists
+      if (authservice.userExists(userModel.getid())) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+      }
+      // Create a new user
+      crudControllerUser.create(userModel);
+      return ResponseEntity.ok("User created");
     }
     catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
