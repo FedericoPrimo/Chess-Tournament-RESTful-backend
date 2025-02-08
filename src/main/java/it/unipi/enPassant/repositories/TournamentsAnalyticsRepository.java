@@ -1,6 +1,6 @@
 package it.unipi.enPassant.repositories;
 
-import it.unipi.enPassant.model.requests.DocumentTournament;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentsAnalyticsModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
