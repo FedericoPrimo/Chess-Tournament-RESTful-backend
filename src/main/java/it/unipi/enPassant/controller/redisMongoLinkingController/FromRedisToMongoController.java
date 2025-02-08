@@ -162,7 +162,7 @@ public class FromRedisToMongoController {
         mongoTemplate.updateFirst(query, update, "tournaments");
     }
 
-    // This is the other core part of the getMapping. The aims are to insert the live match already ends in the DocumentDB
+    // This is another core part of the getMapping. The aims are to insert the live match already ends in the DocumentDB
     // in this way they could be stored , we can flush the KeyValue DB without losing information.
     // Some System.out were add in order to improve the readability of the code in the execution phase.
     //this function use the ausiliar function calculateDuration(), retrieveUserInformation() and updateUserInformation()
@@ -287,6 +287,11 @@ public class FromRedisToMongoController {
         return 0;
     }
 
+    // This is the last core function here we garantee data integrity updating the user document everytime we insert
+    // a tournament match. This is made by two steps first we create the embedded document and in a second instance
+    // we update all the statistical fields. This function use the ausiliar function updateUserMatchRecord() in order
+    // to keep the code as much modular as possible.
+    // (There are some print that are usefull to view the various execution status of the function)
     private void updateUserInformation(DocumentMatch match) {
         String whitePlayerId = match.getWhite();
         String blackPlayerId = match.getBlack();
@@ -366,6 +371,5 @@ public class FromRedisToMongoController {
 
         mongoTemplate.updateFirst(query, update, "user");
     }
-
 
 }
