@@ -3,6 +3,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,9 @@ public class LiveMatchService {
         Map<String, String> details = new HashMap<>();
         details.put("category", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":category"));
         details.put("startingTime", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":startingTime"));
+        details.put("winner", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":winner"));
+        details.put("endTime", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":endTime"));
+        details.put("ECO", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":ECO"));
         return details;
     }
 
@@ -90,5 +95,12 @@ public class LiveMatchService {
         String moveListKey = "Live:" + matchId + ":moveList";
         List<Object> moves = redisTemplate.opsForList().range(moveListKey, 0, -1);
         return moves != null ? moves.stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    public void insertMatchResult(String matchId, String winner, String ECO) {
+        String endTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        redisTemplate.opsForValue().set("Live:" + matchId + ":winner", winner);
+        redisTemplate.opsForValue().set("Live:" + matchId + ":endTime", endTime);
+        redisTemplate.opsForValue().set("Live:" + matchId + ":ECO", ECO);
     }
 }

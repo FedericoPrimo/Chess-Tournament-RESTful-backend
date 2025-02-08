@@ -1,6 +1,6 @@
 package it.unipi.enPassant.controller.mongoController;
 
-import it.unipi.enPassant.model.requests.LoginRequest;
+import it.unipi.enPassant.model.requests.LoginModel;
 import it.unipi.enPassant.service.AuthenticationService;
 import it.unipi.enPassant.service.mongoService.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +19,4 @@ public class PlayerController extends GenericUserController {
     super(authservice, dataservice);
   }
 
-  /* Here we have all the API endpoints */
-  @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-    try {
-      if(authservice.PlayerLoginControl(loginRequest)){
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
-      }
-      else{
-        return new ResponseEntity<>("Login failed", HttpStatus.UNAUTHORIZED);
-      }
-
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 }

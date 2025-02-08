@@ -174,23 +174,23 @@ db.combined.aggregate([{
  */
 
 const users = [
-    { _id: 'smyslov_vassily', BirthDate: '2000-07-28' },
-    { _id: 'kasparov_gary', BirthDate: '1945-03-11' },
-    { _id: 'frattacci_jonathan', BirthDate: '1987-12-03' },
-    { _id: 'anand_viswanathan', BirthDate: '1990-06-24' },
-    { _id: 'lasker_emanuel', BirthDate: '1992-11-19' },
-    { _id: 'alekhine_alexander', BirthDate: '1976-03-17' },
-    { _id: 'botvinnik_mikhail', BirthDate: '1994-10-15' },
-    { _id: 'lucky_luciano', BirthDate: '1943-02-04' },
-    { _id: 'karpov_anatoly', BirthDate: '1987-11-26' },
-    { _id: 'kortschnoj_viktor', BirthDate: '1979-07-31' },
-    { _id: 'carlsen_magnus', BirthDate: '1996-05-17' },
-    { _id: 'gelfand_boris', BirthDate: '1950-10-03' },
-    { _id: 'calzolari_federico', BirthDate: '2000-08-13' },
-    { _id: 'topalov_veselin', BirthDate: '1965-12-17' },
-    { _id: 'segreto_mattia', BirthDate: '1946-02-13' },
-    { _id: 'steinitz_william', BirthDate: '1965-10-23' },
-    { _id: 'euwe_max', BirthDate: '1979-05-12' }
+    { _id: 'smyslov_vassily', BirthDate: '2000-07-28', Password:'$2a$10$6lfytGWURMcnUw.oS8ZZDOAd4iV5H3XHPwTiv8K6t4UuihIyI8dey' },
+    { _id: 'kasparov_gary', BirthDate: '1945-03-11', Password:'$2a$10$VrCFrHzbTfBomry0jGhdquwrm0y5zNEkqbrHJ8EsFvWT0.C8dLMx6' },
+    { _id: 'frattacci_jonathan', BirthDate: '1987-12-03', Password:'$2a$10$6OdY/TeQbAOXc01EeKlnxenQR4xPqRlNwb70fjAz1RWtPxrEqJQgm' },
+    { _id: 'anand_viswanathan', BirthDate: '1990-06-24', Password:'$2a$10$868iA6jaMuJ622Zt.VTxDeYEKWtTvQq6hMIEEmy9GtAjUknyhJdsK' },
+    { _id: 'lasker_emanuel', BirthDate: '1992-11-19', Password:'$2a$10$je7jeOBZlQ1UfbXKoHBGv.DoILsx7oTP5ruEy8mrfNNlKtSPCCPHe' },
+    { _id: 'alekhine_alexander', BirthDate: '1976-03-17', Password:'$2a$10$Je/99MwCc8oE08xwdd45SuBvrgJiaK2IDx8zzlfSZ8N0K/F9J/M6e' },
+    { _id: 'botvinnik_mikhail', BirthDate: '1994-10-15', Password:'$2a$10$5PGofe03.iyIV2ON9GMRs./P0WWYETu7otkblnFDdHbSKYKJMNEpe' },
+    { _id: 'lucky_luciano', BirthDate: '1943-02-04', Password:'$2a$10$4bohAccDUO66mbxUCvEtg.IE03WGa9C9lOb.dxSfuhtlMO/XeJiua' },
+    { _id: 'karpov_anatoly', BirthDate: '1987-11-26', Password:'$2a$10$On8yjqek1hwbUgVud5npZOav5IjrFfbhlrs57n8qFAyzxUAdxAbai' },
+    { _id: 'kortschnoj_viktor', BirthDate: '1979-07-31', Password:'$2a$10$DrIXIpzoDMC2PM4Etzttw.M/SVBPP23HKqDBWe4qPr0NwkBgLU7Am' },
+    { _id: 'carlsen_magnus', BirthDate: '1996-05-17', Password:'$2a$10$Jr.cxA/sqV8beTUV7sHede5YjTZhwhJoKsPDl8YOW7DK8c6YWsHjG' },
+    { _id: 'gelfand_boris', BirthDate: '1950-10-03', Password:'$2a$10$SMg31AW6sqmwHsv5T81zqO4UAwN35pLW4i8ynCKJ2ZvYV7hemQCr2' },
+    { _id: 'calzolari_federico', BirthDate: '2000-08-13', Password:'$2a$10$rB6vINUMVkAP213GDIBQRu5oojvTpW9fXaFwYhRjJVi/vCvqcc5Gy' },
+    { _id: 'topalov_veselin', BirthDate: '1965-12-17', Password:'$2a$10$N6tkLd/3HcKgDCT77IW.y.eBOQAL9t8Y8cO2XDLxvIkJZhDlAVWD.' },
+    { _id: 'segreto_mattia', BirthDate: '1946-02-13', Password:'$2a$10$1ppRHn1Q4BTEwkjVp7tVb..SLdYQVP/rTSPhf1EVWt5YW4mntWNKO'},
+    { _id: 'steinitz_william', BirthDate: '1965-10-23', Password:'$2a$10$TGduMgY0qk.FFriAksQBiu0No/HWJi1qiAn7KF/INDLMa.w4bgoPq' },
+    { _id: 'euwe_max', BirthDate: '1979-05-12', Password:'$2a$10$8HLLewIFIX/1xaMICnSl9.9T0qhxh.OZSP3YqvgnTKqksCZkvtBxq' }
 ];
 
 // Iterate over the user list and update documents
@@ -208,7 +208,7 @@ users.forEach(user => {
                 Surname: surname,          
                 Name: name,                
                 Type: '1',                 
-                Password: user._id         
+                Password: user.Password         
             }
         }
     );

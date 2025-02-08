@@ -14,22 +14,38 @@ public class DocumentUser {
     private String Surname;
     private String Type;
     private int ELO;
+    private boolean State; // Indica se l'utente è squalificato
     private List<DocumentMatchUser> Matches;
+
+    // Nuovi campi per le statistiche
+    private int NumberOfPlayedMatches;
+    private int NumberOfVictories;
+    private int NumberOfDefeats;
+    private int NumberOfDraws;
+    private double avgMovesNumber; // Unico campo che inizia con minuscola
 
     // Costruttore vuoto
     public DocumentUser() {}
 
     // Costruttore completo
-    public DocumentUser(String id, String BirthDate, String Name, String Password, String Surname, 
-                        String Type, int ELO, List<DocumentMatchUser> Matches) {
-        this.id = id;
+    public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
+                        String Type, int ELO, boolean State, List<DocumentMatchUser> Matches,
+                        int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
+                        int NumberOfDraws, double avgMovesNumber) {
+        this.id = Id;
         this.BirthDate = BirthDate;
         this.Name = Name;
         this.Password = Password;
         this.Surname = Surname;
         this.Type = Type;
         this.ELO = ELO;
+        this.State = State;
         this.Matches = Matches;
+        this.NumberOfPlayedMatches = NumberOfPlayedMatches;
+        this.NumberOfVictories = NumberOfVictories;
+        this.NumberOfDefeats = NumberOfDefeats;
+        this.NumberOfDraws = NumberOfDraws;
+        this.avgMovesNumber = avgMovesNumber;
     }
 
     // Getter e Setter
@@ -37,8 +53,8 @@ public class DocumentUser {
         return id;
     }
 
-    public void setid(String id) {
-        this.id = id;
+    public void setId(String Id) {
+        this.id = Id;
     }
 
     public String getBirthDate() {
@@ -89,6 +105,14 @@ public class DocumentUser {
         this.ELO = ELO;
     }
 
+    public boolean isState() {
+        return State;
+    }
+
+    public void setState(boolean State) {
+        this.State = State;
+    }
+
     public List<DocumentMatchUser> getMatches() {
         return Matches;
     }
@@ -96,5 +120,44 @@ public class DocumentUser {
     public void setMatches(List<DocumentMatchUser> Matches) {
         this.Matches = Matches;
     }
-}
 
+    public int getNumberOfPlayedMatches() {
+        return NumberOfPlayedMatches;
+    }
+
+    public void setNumberOfPlayedMatches(int NumberOfPlayedMatches) {
+        this.NumberOfPlayedMatches = NumberOfPlayedMatches;
+    }
+
+    public int getNumberOfVictories() {
+        return NumberOfVictories;
+    }
+
+    public void setNumberOfVictories(int NumberOfVictories) {
+        this.NumberOfVictories = NumberOfVictories;
+    }
+
+    public int getNumberOfDefeats() {
+        return NumberOfDefeats;
+    }
+
+    public void setNumberOfDefeats(int NumberOfDefeats) {
+        this.NumberOfDefeats = NumberOfDefeats;
+    }
+
+    public int getNumberOfDraws() {
+        return NumberOfDraws;
+    }
+
+    public void setNumberOfDraws(int NumberOfDraws) {
+        this.NumberOfDraws = NumberOfDraws;
+    }
+
+    public double getAvgMovesNumber() {
+        return avgMovesNumber;
+    }
+
+    public void setAvgMovesNumber(double avgMovesNumber) {
+        this.avgMovesNumber = avgMovesNumber;
+    }
+}

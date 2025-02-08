@@ -1,8 +1,10 @@
 import requests
 import time
 
-URL = "http://localhost:8080/api/LiveMatch/insertMoves/segreto_mattia/segreto_mattia-frattacci_jonathan"  # Sostituisci con l'URL effettivo
+URL = "http://localhost:8080/api/LiveMatch/insertMoves/segreto_mattia/segreto_mattia-bro_bro"
+RESULT_URL = "http://localhost:8080/api/LiveMatch/insertMatchResult/segreto_mattia-bro_bro/segreto_mattia/A4"
 INTERVAL = 3  # Secondi tra una mossa e l'altra
+END_DELAY = 5  # Secondi di attesa prima di inviare il risultato della partita
 
 # Lista di mosse (simulazione di una partita)
 WHITE_MOVES = [
@@ -15,7 +17,7 @@ def white():
     headers = {"Content-Type": "text/plain"}  # Indichiamo che stiamo inviando solo testo
     for move in WHITE_MOVES:
         try:
-            response = requests.post(URL, data=move, headers=headers)  # Invio solo la stringa della mossa
+            response = requests.post(URL, data=move, headers=headers)
             print(f"White - Move: {move} | Status: {response.status_code}, Response: {response.text}")
         except Exception as e:
             print(f"Errore: {e}")
@@ -23,6 +25,16 @@ def white():
         time.sleep(INTERVAL)  # Attendere prima della prossima mossa
 
     print("White ha terminato tutte le mosse.")
+
+    # Attendere 5 secondi prima di inviare il risultato della partita
+    time.sleep(END_DELAY)
+
+    # Chiamata finale per inserire il risultato della partita
+    try:
+        result_response = requests.post(RESULT_URL)
+        print(f"Risultato partita inviato. Status: {result_response.status_code}, Response: {result_response.text}")
+    except Exception as e:
+        print(f"Errore durante l'invio del risultato della partita: {e}")
 
 if __name__ == "__main__":
     white()

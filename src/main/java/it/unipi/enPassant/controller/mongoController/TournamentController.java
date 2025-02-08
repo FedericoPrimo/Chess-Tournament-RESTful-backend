@@ -6,6 +6,7 @@ import it.unipi.enPassant.service.mongoService.DataServiceTournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,6 +59,18 @@ public class TournamentController{
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(tournamentMatch);
+    }
+
+    @PutMapping("/tournamentUpdateWinner/{category}/{edition}/{location}")
+    public ResponseEntity<String> tournamentUpdateWinner(
+            @PathVariable String category, @PathVariable int edition, @PathVariable String location){
+        if (dataService.updatewinner(edition, category, location)) {
+            return ResponseEntity.ok("Tournament winner successfully updated for " +
+                    "Edition: " + edition + ", Category: " + category + ", Location: " + location);
+        } else {
+            return ResponseEntity.badRequest().body("Failed to update tournament winner for " +
+                    "Edition: " + edition + ", Category: " + category + ", Location: " + location);
+        }
     }
 }
 

@@ -13,11 +13,8 @@ import java.util.List;
 public class DocumentMatch {
     private int Date;
     private String White;
-    private int WhiteElo;
     private String Eco;
     private String Black;
-    private int BlackElo;
-    private String Event;
     private String Result;
     private String Category;
     private List<String> Moves;
@@ -29,15 +26,12 @@ public class DocumentMatch {
     public DocumentMatch() {}
 
     // Costruttore completo
-    public DocumentMatch(int Date, String White, int WhiteElo, String Eco, String Black, int BlackElo, String Event,
+    public DocumentMatch(int Date, String White, String Eco, String Black,
                          String Result, String Category, List<String> Moves, String Winner, String Timestamp, double Duration) {
         this.Date = Date;
         this.White = White;
-        this.WhiteElo = WhiteElo;
         this.Eco = Eco;
         this.Black = Black;
-        this.BlackElo = BlackElo;
-        this.Event = Event;
         this.Result = Result;
         this.Category = Category;
         this.Moves = Moves;
@@ -63,14 +57,6 @@ public class DocumentMatch {
         this.White = White;
     }
 
-    public int getWhiteElo() {
-        return WhiteElo;
-    }
-
-    public void setWhiteElo(int WhiteElo) {
-        this.WhiteElo = WhiteElo;
-    }
-
     public String getEco() {
         return Eco;
     }
@@ -85,22 +71,6 @@ public class DocumentMatch {
 
     public void setBlack(String Black) {
         this.Black = Black;
-    }
-
-    public int getBlackElo() {
-        return BlackElo;
-    }
-
-    public void setBlackElo(int BlackElo) {
-        this.BlackElo = BlackElo;
-    }
-
-    public String getEvent() {
-        return Event;
-    }
-
-    public void setEvent(String Event) {
-        this.Event = Event;
     }
 
     public String getResult() {

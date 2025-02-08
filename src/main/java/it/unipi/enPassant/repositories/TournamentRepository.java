@@ -1,10 +1,15 @@
 package it.unipi.enPassant.repositories;
-import it.unipi.enPassant.model.requests.mongoModel.tournament.*;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DataTournamentMatchModel;
+import it.unipi.enPassant.model.requests.DocumentTournament;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TournamentRepository extends MongoRepository<DocumentTournament, String>{
@@ -58,5 +63,18 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
     })
     List<UserMatchUpdateModel> findMatchesForUser(String username);
 
+    @Aggregation(pipeline = {
+            "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
+            "{ $unwind: '$RawMatches' }",
+            "{ $match: { 'RawMatches.Winner': { $ne: 'draw' } } }",
+            "{ $group: { _id: '$RawMatches.Winner', wins: { $sum: 1 } } }",
+            "{ $sort: { wins: -1 } }",
+            "{ $limit: 1 }",
+            "{ $project: { _id: 1} }"
+    })
+    String findWinnerByEditionCategoryLocation(int edition, String category, String location);
 
+    @Query("{ 'Edition': ?0, 'Category': ?1, 'Location': ?2 }")
+    Optional<it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament> findByEditionAndCategoryAndLocation(int edition, String category, String location);
 }
+
