@@ -60,6 +60,18 @@ public class TournamentController{
         }
         return ResponseEntity.ok(tournamentMatch);
     }
+
+    @PutMapping("/tournamentUpdateWinner/{category}/{edition}/{location}")
+    public ResponseEntity<String> tournamentUpdateWinner(
+            @PathVariable String category, @PathVariable int edition, @PathVariable String location){
+        if (dataService.updatewinner(edition, category, location)) {
+            return ResponseEntity.ok("Tournament winner successfully updated for " +
+                    "Edition: " + edition + ", Category: " + category + ", Location: " + location);
+        } else {
+            return ResponseEntity.badRequest().body("Failed to update tournament winner for " +
+                    "Edition: " + edition + ", Category: " + category + ", Location: " + location);
+        }
+    }
 }
 
 

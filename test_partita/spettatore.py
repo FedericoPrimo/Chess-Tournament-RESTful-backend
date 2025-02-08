@@ -1,9 +1,11 @@
 import requests
 import time
 
-URL = "http://localhost:8080/api/LiveMatch/retrieveMoveList/segreto_mattia-frattacci_jonathan"  # Sostituisci con l'URL corretto
+URL = "http://localhost:8080/api/LiveMatch/retrieveMoveList/segreto_mattia-bro_bro"  # Sostituisci con l'URL corretto
+RESULT_URL = "http://localhost:8080/api/LiveMatch/matchDetails/segreto_mattia-bro_bro"
 INTERVAL = 2  # Secondi tra le richieste
 MAX_NO_CHANGE_COUNT = 5  # Numero massimo di tentativi senza cambiamenti
+END_DELAY = 5 
 
 def spettatore():
     last_response = None  # Memorizza l'ultima risposta ricevuta
@@ -42,6 +44,15 @@ def spettatore():
             print(f"Errore durante la richiesta: {e}")
 
         time.sleep(INTERVAL)
+    
+    time.sleep(END_DELAY)
+
+    # Chiamata finale per inserire il risultato della partita
+    try:
+        result_response = requests.get(RESULT_URL)
+        print(f"Risultato partita inviato. Status: {result_response.status_code}, Response: {result_response.text}")
+    except Exception as e:
+        print(f"Errore durante l'invio del risultato della partita: {e}")
 
 if __name__ == "__main__":
     spettatore()

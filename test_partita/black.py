@@ -1,7 +1,7 @@
 import requests
 import time
 
-URL = "http://localhost:8080/api/LiveMatch/insertMoves/frattacci_jonathan/segreto_mattia-frattacci_jonathan"  # Sostituisci con l'URL effettivo
+URL = "http://localhost:8080/api/LiveMatch/insertMoves/bro_bro/segreto_mattia-bro_bro"  # Sostituisci con l'URL effettivo
 INTERVAL = 3  # Secondi tra una mossa e l'altra
 
 # Lista di mosse (simulazione di una partita)
