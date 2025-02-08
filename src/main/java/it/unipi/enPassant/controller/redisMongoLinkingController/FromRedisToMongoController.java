@@ -342,9 +342,10 @@ public class FromRedisToMongoController {
         update.inc("NumberOfPlayedMatches", 1);
         if (winner.equals(userId)) {
             update.inc("NumberOfVictories", 1);
-            update.inc("ELO", 50);
+            update.inc("ELO", 80);
         } else if (winner.equals("draw")) {
             update.inc("NumberOfDraw", 1);
+            update.inc("ELO", 10);
         } else {
             update.inc("NumberOfDefeats", 1);
             update.inc("ELO", -50);
