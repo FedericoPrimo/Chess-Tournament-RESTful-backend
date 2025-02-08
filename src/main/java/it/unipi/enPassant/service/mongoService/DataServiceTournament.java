@@ -1,6 +1,6 @@
 package it.unipi.enPassant.service.mongoService;
 
-import it.unipi.enPassant.model.requests.DocumentTournament;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.*;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;

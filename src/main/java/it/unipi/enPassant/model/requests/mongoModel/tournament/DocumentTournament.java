@@ -1,4 +1,4 @@
-package it.unipi.enPassant.model.requests;
+package it.unipi.enPassant.model.requests.mongoModel.tournament;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,13 +25,13 @@ public class DocumentTournament {
     public DocumentTournament() {}
 
     public DocumentTournament(int edition, String category, String entryClosingDate,
-                              String location, String winner, List<DocumentMatch> rawMatches) {
+                              String location, String winner, List<DocumentMatch> RawMatches) {
         this.Edition = edition;
         this.Category = category;
         this.Entry_Closing_Date = entryClosingDate;
         this.Location = location;
         this.Winner = winner;
-        this.RawMatches = rawMatches;
+        this.RawMatches = RawMatches;
     }
 
     // Getter
@@ -88,7 +88,7 @@ public class DocumentTournament {
         this.Winner = winner;
     }
 
-    public void setRawMatches(List<DocumentMatch> rawMatches) {
-        this.RawMatches = rawMatches;
+    public void setRawMatches(List<DocumentMatch> RawMatches) {
+        this.RawMatches = RawMatches;
     }
 }

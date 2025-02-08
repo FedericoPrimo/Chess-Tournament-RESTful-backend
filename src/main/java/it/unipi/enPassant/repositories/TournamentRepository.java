@@ -1,4 +1,6 @@
 package it.unipi.enPassant.repositories;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DataTournamentMatchModel;
+import it.unipi.enPassant.model.requests.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -42,7 +44,24 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
                     + " moveList: '$RawMatches.Moves'"
                     + "} }"
     })
-    DocumentTournament findMatchofTournament(int edition, String category, String location, String Black, String White);
+    DataTournamentMatchModel findMatchofTournament(int edition, String category, String location, String Black, String White);
+
+    @Aggregation(pipeline = {
+            "{ $unwind: '$RawMatches' }",
+            "{ $match: { $or: [ { 'RawMatches.White': ?0 }, { 'RawMatches.Black': ?0 } ] } }",
+            "{ $project: { " +
+                    "'Color': { $cond: [ { $eq: ['$RawMatches.White', ?0] }, 'White', 'Black' ] }, " +
+                    "'OpponentId': { $cond: [ { $eq: ['$RawMatches.White', ?0] }, '$RawMatches.Black', '$RawMatches.White' ] }, " +
+                    "'Outcome': { $cond: [ { $eq: ['$RawMatches.Winner', ?0] }, 'win', " +
+                    "{ $cond: [ { $eq: ['$RawMatches.Winner', " +
+                    "{ $cond: [ { $eq: ['$RawMatches.White', ?0] }, '$RawMatches.Black', '$RawMatches.White' ] } ] }, 'loss', 'draw' ] } ] }, " +
+                    "'Opening': { $ifNull: ['$RawMatches.ECO', 'unknown'] }, " +
+                    "'TournamentEdition': '$Edition', " +
+                    "'TournamentCategory': '$Category', " +
+                    "'NumberOfMoves': { $size: { $ifNull: ['$RawMatches.Moves', []] } } " +
+                    "} }"
+    })
+    List<UserMatchUpdateModel> findMatchesForUser(String username);
 
     @Aggregation(pipeline = {
             "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
@@ -56,5 +75,6 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
     String findWinnerByEditionCategoryLocation(int edition, String category, String location);
 
     @Query("{ 'Edition': ?0, 'Category': ?1, 'Location': ?2 }")
-    Optional<DocumentTournament> findByEditionAndCategoryAndLocation(int edition, String category, String location);
+    Optional<it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament> findByEditionAndCategoryAndLocation(int edition, String category, String location);
 }
+
