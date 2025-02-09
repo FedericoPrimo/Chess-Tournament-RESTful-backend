@@ -1,11 +1,12 @@
 package it.unipi.enPassant.service.redisService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ManagePlayerService {
@@ -13,40 +14,61 @@ public class ManagePlayerService {
     private static final String DISQUALIFIED_PLAYERS_KEY = "disqualified_players";
     private static final String REGISTERED_PLAYERS_KEY = "registered_players";
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final JedisPool jedisPool;
 
-    /*DISQUALIFIED PLAYER SECTION*/
+    public ManagePlayerService(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
+    }
+
+    /* DISQUALIFIED PLAYER SECTION */
     public void addDisqualifiedPlayer(String playerId) {
-        redisTemplate.opsForSet().add(DISQUALIFIED_PLAYERS_KEY, playerId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.sadd(DISQUALIFIED_PLAYERS_KEY, playerId);
+        }
     }
 
     public void removeDisqualifiedPlayer(String playerId) {
-        redisTemplate.opsForSet().remove(DISQUALIFIED_PLAYERS_KEY, playerId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.srem(DISQUALIFIED_PLAYERS_KEY, playerId);
+        }
     }
 
     public boolean isPlayerDisqualified(String playerId) {
-        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(DISQUALIFIED_PLAYERS_KEY, playerId));
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.sismember(DISQUALIFIED_PLAYERS_KEY, playerId);
+        }
     }
 
-    public Set<Object> getAllDisqualifiedPlayers() {
-        return redisTemplate.opsForSet().members(DISQUALIFIED_PLAYERS_KEY);
+    public Set<String> getAllDisqualifiedPlayers() {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.smembers(DISQUALIFIED_PLAYERS_KEY);
+        }
     }
 
-    /*ENROLL CATEGORY SECTION*/
+    /* ENROLL CATEGORY SECTION */
     public void registerPlayer(String playerId, String category) {
-        redisTemplate.opsForHash().put(REGISTERED_PLAYERS_KEY, playerId, category);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.hset(REGISTERED_PLAYERS_KEY, playerId, category);
+        }
     }
 
     public void removeRegisteredPlayer(String playerId) {
-        redisTemplate.opsForHash().delete(REGISTERED_PLAYERS_KEY, playerId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.hdel(REGISTERED_PLAYERS_KEY, playerId);
+        }
     }
 
     public boolean isPlayerRegistered(String playerId) {
-        return redisTemplate.opsForHash().hasKey(REGISTERED_PLAYERS_KEY, playerId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hexists(REGISTERED_PLAYERS_KEY, playerId);
+        }
     }
 
-    public Map<Object, Object> getAllRegisteredPlayers() {
-        return redisTemplate.opsForHash().entries(REGISTERED_PLAYERS_KEY);
+    public Map<String, String> getAllRegisteredPlayers() {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.hgetAll(REGISTERED_PLAYERS_KEY);
+        }
     }
 }
+
+

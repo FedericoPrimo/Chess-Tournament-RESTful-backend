@@ -36,18 +36,19 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
       roles = authentication.getAuthorities().stream()
               .map(GrantedAuthority::getAuthority)
               .collect(Collectors.joining(", "));
-      logger.warn("Accesso negato per l'utente: {} con ruoli: {}", authentication.getName(), roles);
+      logger.warn("Access denied for user: {} with roles: {}", authentication.getName(), roles);
     } else {
-      logger.warn("Accesso negato per utente non autenticato.");
+      logger.warn("Access denied for unauthenticated user.");
     }
-    // Imposta il content type e lo status
+
+    // Set content type and status
     response.setContentType("application/json;charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-    // Crea un body in formato JSON (puoi adattarlo secondo le tue esigenze)
-    String jsonBody = String.format("{\"error\":\"Accesso negato!\",\"roles\":\"%s\"}", roles);
+    // Create a JSON-formatted response body (adaptable it as needed)
+    String jsonBody = String.format("{\"error\":\"Access denied!\",\"roles\":\"%s\"}", roles);
 
-    // Scrivi il body nella response
+    // Write the response body
     PrintWriter writer = response.getWriter();
     writer.write(jsonBody);
     writer.flush();

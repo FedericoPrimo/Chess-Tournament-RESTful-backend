@@ -42,7 +42,7 @@ public class UserMatchUpdateModel {
         this.NumberOfMoves = NumberOfMoves;
     }
 
-    //getter e setter
+    //getter & setter
     public String getOpponentId() {return OppponentId;}
     public void setOpponentId(String opponentId) {OppponentId = opponentId;}
 

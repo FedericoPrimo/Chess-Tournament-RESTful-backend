@@ -12,7 +12,7 @@ public class Request implements Serializable {
         this.text = text;
     }
 
-    // Getter e Setter
+    // Getter & Setter
     public String getNomeUtente() { return nomeUtente; }
     public void setNomeUtente(String nomeUtente) { this.nomeUtente = nomeUtente; }
 

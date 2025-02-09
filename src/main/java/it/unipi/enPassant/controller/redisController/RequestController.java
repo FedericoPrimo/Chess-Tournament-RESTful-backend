@@ -12,28 +12,27 @@ public class RequestController {
     @Autowired
     private RequestService requestService;
 
-    // Aggiungere una nuova richiesta in coda
+    // Add a new request to the queue
     @PostMapping("/insert")
     public Long addRequest(@RequestBody Request request) {
         return requestService.addRequest(request);
     }
 
-    // Leggere ed eliminare la prossima richiesta nella coda
+    // Read and remove the next request from the queue
     @GetMapping("/next")
     public Request consumeNextRequest() {
         return requestService.consumeNextRequest();
     }
 
-    // Ottenere il numero di richieste attualmente in coda
+    // Get the number of requests currently in the queue
     @GetMapping("/size")
     public Long getQueueSize() {
         return requestService.getQueueSize();
     }
 
-    // Resettare completamente la coda
+    // Completely reset the queue
     @DeleteMapping("/reset")
     public void resetQueue() {
         requestService.resetQueue();
     }
 }
-

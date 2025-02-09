@@ -1,106 +1,127 @@
 package it.unipi.enPassant.service.redisService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class LiveMatchService {
     private static final String LIVE_MATCHES_KEY = "Live:matches";
+    private final JedisPool jedisPool;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    public LiveMatchService(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
+    }
 
+    // Initialize progressive move key if it does not exist
     private void initializeProgressiveMoveKey(String matchId) {
-        String progressiveKey = "Live:" + matchId + ":progressive";
-        if (redisTemplate.opsForValue().get(progressiveKey) == null) {
-            redisTemplate.opsForValue().set(progressiveKey, 1L);
+        try (Jedis jedis = jedisPool.getResource()) {
+            String progressiveKey = "Live:" + matchId + ":progressive";
+            if (jedis.get(progressiveKey) == null) {
+                jedis.set(progressiveKey, "1");
+            }
         }
     }
 
-    /*si può implementare un inserimento multiplo nel controller*/
+    // Add a live match to the Redis set and store its details
     public void addLiveMatch(String matchId, String category, String startingTime) {
-        redisTemplate.opsForSet().add(LIVE_MATCHES_KEY, matchId);
-        redisTemplate.opsForValue().set("Live:" + matchId + ":category", category);
-        redisTemplate.opsForValue().set("Live:" + matchId + ":startingTime", startingTime);
-        initializeProgressiveMoveKey(matchId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.sadd(LIVE_MATCHES_KEY, matchId);
+            jedis.set("Live:" + matchId + ":category", category);
+            jedis.set("Live:" + matchId + ":startingTime", startingTime);
+            initializeProgressiveMoveKey(matchId);
+        }
     }
 
+    // Retrieve the list of live matches
     public List<String> getLiveMatches() {
-        return new ArrayList<>(redisTemplate.opsForSet().members(LIVE_MATCHES_KEY)
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.toList()));
+        try (Jedis jedis = jedisPool.getResource()) {
+            return new ArrayList<>(jedis.smembers(LIVE_MATCHES_KEY));
+        }
     }
 
+    // Retrieve match details from Redis
     public Map<String, String> getMatchDetails(String matchId) {
-        Map<String, String> details = new HashMap<>();
-        details.put("category", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":category"));
-        details.put("startingTime", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":startingTime"));
-        details.put("winner", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":winner"));
-        details.put("endTime", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":endTime"));
-        details.put("ECO", (String) redisTemplate.opsForValue().get("Live:" + matchId + ":ECO"));
-        return details;
+        try (Jedis jedis = jedisPool.getResource()) {
+            Map<String, String> details = new HashMap<>();
+            details.put("category", jedis.get("Live:" + matchId + ":category"));
+            details.put("startingTime", jedis.get("Live:" + matchId + ":startingTime"));
+            details.put("winner", jedis.get("Live:" + matchId + ":winner"));
+            details.put("endTime", jedis.get("Live:" + matchId + ":endTime"));
+            details.put("ECO", jedis.get("Live:" + matchId + ":ECO"));
+            return details;
+        }
     }
 
+    // Remove a live match and its associated data from Redis
     public void removeLiveMatch(String matchId) {
-        redisTemplate.opsForSet().remove(LIVE_MATCHES_KEY, matchId);
-        redisTemplate.delete("Live:" + matchId + ":category");
-        redisTemplate.delete("Live:" + matchId + ":startingTime");
-        redisTemplate.delete("Live:" + matchId + ":progressive");
-        redisTemplate.delete("Live:" + matchId + ":moveList");
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.srem(LIVE_MATCHES_KEY, matchId);
+            jedis.del("Live:" + matchId + ":category",
+                    "Live:" + matchId + ":startingTime",
+                    "Live:" + matchId + ":progressive",
+                    "Live:" + matchId + ":moveList");
+        }
     }
 
+    // Add a move to the match while ensuring turn order
     public Boolean addMoves(String moves, String user, String matchId) {
-        String progressiveKey = "Live:" + matchId + ":progressive";
-        String moveListKey = "Live:" + matchId + ":moveList";
-        initializeProgressiveMoveKey(matchId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            String progressiveKey = "Live:" + matchId + ":progressive";
+            String moveListKey = "Live:" + matchId + ":moveList";
+            initializeProgressiveMoveKey(matchId);
 
-        Long currentProgressive = redisTemplate.opsForValue().get(progressiveKey) != null ?
-                Long.parseLong(redisTemplate.opsForValue().get(progressiveKey).toString()) : 0L;
-        // Estrarre user1 e user2 dal matchId
-        String[] users = matchId.split("-");
-        if (users.length != 2) {
-            return false; // Formato matchId non valido
+            Long currentProgressive = jedis.get(progressiveKey) != null ?
+                    Long.parseLong(jedis.get(progressiveKey)) : 0L;
+
+            // Extract user1 and user2 from matchId
+            String[] users = matchId.split("-");
+            if (users.length != 2) {
+                return false; // Invalid matchId format
+            }
+            String user1 = users[0];
+            String user2 = users[1];
+
+            // Check if the user is part of the match
+            if (!user.equals(user1) && !user.equals(user2)) {
+                return false; // User is not part of the match
+            }
+
+            // Check if it is the user's turn
+            boolean isUser1Turn = (currentProgressive % 2 == 1);
+            if ((user.equals(user1) && !isUser1Turn) || (user.equals(user2) && isUser1Turn)) {
+                return false; // Not the user's turn
+            }
+
+            moves = currentProgressive + "." + moves;
+            // Increment the progressive counter and save the move
+            jedis.set(progressiveKey, String.valueOf(currentProgressive + 1));
+            jedis.rpush(moveListKey, moves);
+            return true;
         }
-        String user1 = users[0];
-        String user2 = users[1];
-
-        // Controllo se l'utente è nel match
-        if (!user.equals(user1) && !user.equals(user2)) {
-            return false; // Utente non appartiene al match
-        }
-
-        // Controllo se è il turno dell'utente
-        boolean isUser1Turn = (currentProgressive % 2 == 1);
-        if ((user.equals(user1) && !isUser1Turn) || (user.equals(user2) && isUser1Turn)) {
-            return false; // Non è il turno dell'utente
-        }
-
-        moves = currentProgressive + "." + moves;
-        // Incrementa il progressivo e salva la mossa
-        redisTemplate.opsForValue().set(progressiveKey, currentProgressive + 1);
-        redisTemplate.opsForList().rightPush(moveListKey, moves);
-        return true;
     }
 
+    // Retrieve the list of moves for a specific match
     public List<String> retrieveMovesList(String matchId) {
-        String moveListKey = "Live:" + matchId + ":moveList";
-        List<Object> moves = redisTemplate.opsForList().range(moveListKey, 0, -1);
-        return moves != null ? moves.stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
+        try (Jedis jedis = jedisPool.getResource()) {
+            String moveListKey = "Live:" + matchId + ":moveList";
+            List<String> moves = jedis.lrange(moveListKey, 0, -1);
+            return moves != null ? moves : new ArrayList<>();
+        }
     }
 
+    // Insert the result of a match into Redis
     public void insertMatchResult(String matchId, String winner, String ECO) {
-        String endTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        redisTemplate.opsForValue().set("Live:" + matchId + ":winner", winner);
-        redisTemplate.opsForValue().set("Live:" + matchId + ":endTime", endTime);
-        redisTemplate.opsForValue().set("Live:" + matchId + ":ECO", ECO);
+        try (Jedis jedis = jedisPool.getResource()) {
+            String endTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            jedis.set("Live:" + matchId + ":winner", winner);
+            jedis.set("Live:" + matchId + ":endTime", endTime);
+            jedis.set("Live:" + matchId + ":ECO", ECO);
+        }
     }
 }

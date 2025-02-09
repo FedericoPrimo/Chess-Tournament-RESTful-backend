@@ -3,7 +3,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
-@Document(collection = "user") // Assicurati che il nome della collezione sia corretto
+@Document(collection = "user")
 public class DocumentUser {
 
     @Id
@@ -14,20 +14,19 @@ public class DocumentUser {
     private String Surname;
     private String Type;
     private int ELO;
-    private boolean State; // Indica se l'utente è squalificato
+    private Boolean State; // True if the player is disqualified
     private List<DocumentMatchUser> Matches;
 
-    // Nuovi campi per le statistiche
+
     private int NumberOfPlayedMatches;
     private int NumberOfVictories;
     private int NumberOfDefeats;
     private int NumberOfDraws;
     private double avgMovesNumber; // Unico campo che inizia con minuscola
 
-    // Costruttore vuoto
+
     public DocumentUser() {}
 
-    // Costruttore completo
     public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
                         String Type, int ELO, boolean State, List<DocumentMatchUser> Matches,
                         int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
@@ -48,7 +47,27 @@ public class DocumentUser {
         this.avgMovesNumber = avgMovesNumber;
     }
 
-    // Getter e Setter
+    public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
+                        String Type, int ELO, List<DocumentMatchUser> Matches,
+                        int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
+                        int NumberOfDraws, double avgMovesNumber) {
+        this.id = Id;
+        this.BirthDate = BirthDate;
+        this.Name = Name;
+        this.Password = Password;
+        this.Surname = Surname;
+        this.Type = Type;
+        this.ELO = ELO;
+        this.State = null;
+        this.Matches = Matches;
+        this.NumberOfPlayedMatches = NumberOfPlayedMatches;
+        this.NumberOfVictories = NumberOfVictories;
+        this.NumberOfDefeats = NumberOfDefeats;
+        this.NumberOfDraws = NumberOfDraws;
+        this.avgMovesNumber = avgMovesNumber;
+    }
+
+    // Getter & Setter
     public String getid() {
         return id;
     }

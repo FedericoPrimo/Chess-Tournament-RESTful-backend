@@ -11,13 +11,12 @@ import lombok.Setter;
 public class PlayerRequestModel {
     @JsonProperty("username")
     private String username;
+
     @JsonProperty("text")
     private String text;
 
-    // Costruttore vuoto (necessario per la deserializzazione JSON)
     public PlayerRequestModel() {}
 
-    // Costruttore con parametri
     public PlayerRequestModel(String username, String text) {
         this.username = username;
         this.text = text;

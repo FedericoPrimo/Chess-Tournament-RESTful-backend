@@ -50,7 +50,7 @@ public class FromRedisToMongoController {
     @GetMapping
     public void appUpdate() {
         // 2. Get disqualified players and update MongoDB player status
-        Set<Object> disqualified = managePlayerService.getAllDisqualifiedPlayers();
+        Set<String> disqualified = managePlayerService.getAllDisqualifiedPlayers();
         for (Object user : disqualified) {
             if (user instanceof String userId) {
                 System.out.println(userId);
@@ -61,7 +61,7 @@ public class FromRedisToMongoController {
         }
 
         // 3. Get enrolled players
-        Map<Object, Object> enrolled = managePlayerService.getAllRegisteredPlayers();
+        Map<String, String> enrolled = managePlayerService.getAllRegisteredPlayers();
         categorizePlayers(enrolled);
         System.out.println(blitzPlayers);
         if (!blitzPlayers.isEmpty()) {
@@ -87,12 +87,12 @@ public class FromRedisToMongoController {
     }
 
     // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
-    private void categorizePlayers(Map<Object, Object> enrolled) {
+    private void categorizePlayers(Map<String, String> enrolled) {
         blitzPlayers = new ArrayList<>();
         openPlayers = new ArrayList<>();
         rapidPlayers = new ArrayList<>();
 
-        for (Map.Entry<Object, Object> entry : enrolled.entrySet()) {
+        for (Map.Entry<String, String> entry : enrolled.entrySet()) {
             String playerId = String.valueOf(entry.getKey());
             String category = String.valueOf(entry.getValue());
 

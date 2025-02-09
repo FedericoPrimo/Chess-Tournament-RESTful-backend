@@ -14,11 +14,10 @@ public class StatsModel {
     private int numberOfDraws;
     private double avgMovesNumber;
 
-    // Costruttore vuoto
+
     public StatsModel() {
     }
 
-    // Costruttore con parametri
     public StatsModel(int elo, int numberOfPlayedMatches, int numberOfVictories,
                       int numberOfDefeats, int numberOfDraws, double avgMovesNumber) {
         this.elo = elo;

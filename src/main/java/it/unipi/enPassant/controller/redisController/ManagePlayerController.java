@@ -14,7 +14,7 @@ public class ManagePlayerController {
     private ManagePlayerService managePlayerService;
 
     /*DISQUALIFIED PLAYER SECTION*/
-    @PostMapping("/disqualified/{playerId}")
+    @PostMapping("/disqualify/{playerId}")
     public String addDisqualifiedPlayer(@PathVariable String playerId) {
         managePlayerService.addDisqualifiedPlayer(playerId);
         return "Player " + playerId + " added to disqualified list.";
@@ -35,7 +35,7 @@ public class ManagePlayerController {
     }
 
     @GetMapping("/disqualifiedList")
-    public Set<Object> getAllDisqualifiedPlayers() {
+    public Set<String> getAllDisqualifiedPlayers() {
         return managePlayerService.getAllDisqualifiedPlayers();
     }
 
@@ -61,7 +61,7 @@ public class ManagePlayerController {
     }
 
     @GetMapping("/registerList")
-    public Map<Object, Object> getAllRegisteredPlayers() {
+    public Map<String, String> getAllRegisteredPlayers() {
         return managePlayerService.getAllRegisteredPlayers();
     }
 }

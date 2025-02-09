@@ -24,7 +24,5 @@ public class TournamentModel {
         this.edition = edition;
         this.location = location;
     }
-    public TournamentModel() {
-        // Costruttore vuoto necessario per Jackson
-    }
+    public TournamentModel() {}
 }

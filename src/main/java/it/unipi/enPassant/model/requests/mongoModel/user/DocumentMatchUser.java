@@ -11,10 +11,10 @@ public class DocumentMatchUser {
     private int TournamentEdition;
     private String TournamentCategory;
 
-    // Costruttore vuoto
+
     public DocumentMatchUser() {}
 
-    // Costruttore completo
+
     public DocumentMatchUser(String Color, int NumberOfMoves, String Outcome, String Opening, String OpponentId, int TournamentEdition, String TournamentCategory) {
         this.Color = Color;
         this.NumberOfMoves = NumberOfMoves;
@@ -25,7 +25,7 @@ public class DocumentMatchUser {
         this.TournamentCategory = TournamentCategory;
     }
 
-    // Getter e Setter
+    // Getter & Setter
     public String getColor() {
         return Color;
     }

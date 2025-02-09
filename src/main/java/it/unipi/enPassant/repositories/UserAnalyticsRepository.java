@@ -115,7 +115,7 @@ public interface UserAnalyticsRepository extends MongoRepository<DocumentUser, S
 
     //5: List of disqualified players
     @Aggregation(pipeline = {
-            "{ $match: { status: { $exists: true } } }",
+            "{ $match: { Status: true } }",
             "{ $project: { userId: '$_id' } }"
     })
     List<String> findDisqualified();

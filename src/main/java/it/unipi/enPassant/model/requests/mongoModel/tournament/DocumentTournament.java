@@ -21,7 +21,7 @@ public class DocumentTournament {
 
     private List<DocumentMatch> RawMatches;  // Lista dei match
 
-    // Costruttori, Getter e Setter
+
     public DocumentTournament() {}
 
     public DocumentTournament(int edition, String category, String entryClosingDate,

@@ -110,7 +110,7 @@ users.forEach(user => {
                 Surname: surname,          
                 Name: name,                
                 Type: '1',                 
-                Password: user._id         
+                Password: user.Password        
             }
         }
     );

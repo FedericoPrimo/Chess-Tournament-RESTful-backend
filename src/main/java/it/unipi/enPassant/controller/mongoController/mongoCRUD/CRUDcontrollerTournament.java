@@ -4,13 +4,11 @@ package it.unipi.enPassant.controller.mongoController.mongoCRUD;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.repositories.CRUDrepositoryTournament;
-import it.unipi.enPassant.repositories.UserUpdateRepository;
 import it.unipi.enPassant.service.mongoService.UserUpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.events.Event;
 
 import java.util.*;
 
@@ -36,24 +34,24 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
 
         DocumentTournament tournament = optionalTournament.get();
 
-        // Inizializza rawMatches se è null (per evitare NullPointerException)
+        // Initialize rawMatches if it is null (to avoid NullPointerException)
         if (tournament.getRawMatches() == null) {
             tournament.setRawMatches(new ArrayList<>());
         }
 
-        // Raccolta i giocatori coinvolti senza duplicati
+        // Collect unique players involved without duplicates
         Set<String> uniquePlayers = new HashSet<>();
         for (DocumentMatch match : newMatches) {
-            uniquePlayers.add(match.getWhite()); // Aggiunge il giocatore che gioca con il bianco
-            uniquePlayers.add(match.getBlack()); // Aggiunge il giocatore che gioca con il nero
+            uniquePlayers.add(match.getWhite()); // Adds the player playing as White
+            uniquePlayers.add(match.getBlack()); // Adds the player playing as Black
         }
 
-        // Aggiunge tutti i nuovi match alla lista esistente
+        // Add all new matches to the existing list
         tournament.getRawMatches().addAll(newMatches);
 
-        repository.save(tournament); // Salva il documento aggiornato
+        repository.save(tournament); // Save the updated document
 
-        //Aggiorna i campi dei giocatori coinvolti
+        // Update fields for involved players
         for (String player : uniquePlayers) {
             userUpdateService.updateFields(player);
         }
@@ -66,20 +64,20 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
     public DocumentTournament create(@RequestBody DocumentTournament tournament) {
         DocumentTournament newTournament = super.create(tournament);
 
-        // Verifica se il torneo ha rawMatches e raccoglie i giocatori unici
+        // Check if the tournament has rawMatches and collect unique players
         if (newTournament.getRawMatches() != null) {
             Set<String> uniquePlayers = new HashSet<>();
             for (DocumentMatch match : newTournament.getRawMatches()) {
-                uniquePlayers.add(match.getWhite()); // Aggiunge il giocatore con il bianco
-                uniquePlayers.add(match.getBlack()); // Aggiunge il giocatore con il nero
+                uniquePlayers.add(match.getWhite()); // Adds the player playing as White
+                uniquePlayers.add(match.getBlack()); // Adds the player playing as Black
             }
 
-            // Aggiornamento Campi Player
+            // Update Player Fields
             for (String player : uniquePlayers) {
                 userUpdateService.updateFields(player);
             }
         }
-        return newTournament; // Salva il torneo aggiornato
+        return newTournament; // Save the updated tournament
     }
 
     @Override
@@ -89,11 +87,11 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
         if (response.getStatusCode().is2xxSuccessful() && entity.getRawMatches() != null) {
             Set<String> uniquePlayers = new HashSet<>();
             for (DocumentMatch match : entity.getRawMatches()) {
-                uniquePlayers.add(match.getWhite()); // Aggiunge il giocatore con il bianco
-                uniquePlayers.add(match.getBlack()); // Aggiunge il giocatore con il nero
+                uniquePlayers.add(match.getWhite()); // Adds the player playing as White
+                uniquePlayers.add(match.getBlack()); // Adds the player playing as Black
             }
 
-            // Aggiornamento Campi Player
+            // Update Player Fields
             for (String player : uniquePlayers) {
                 userUpdateService.updateFields(player);
             }
@@ -105,7 +103,7 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
     @DeleteMapping("delete/{id}")
     public ResponseEntity<Map<String, String>> delete(@PathVariable String id) {
 
-        // Recupera il torneo prima di eliminarlo
+        // Retrieve the tournament before deleting it
         Optional<DocumentTournament> optionalTournament = repository.findById(id);
 
         if (optionalTournament.isEmpty()) {
@@ -116,15 +114,15 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
         DocumentTournament tournament = optionalTournament.get();
         Set<String> uniquePlayers = new HashSet<>();
         for (DocumentMatch match : tournament.getRawMatches()) {
-            uniquePlayers.add(match.getWhite()); // Aggiunge il giocatore con il bianco
-            uniquePlayers.add(match.getBlack()); // Aggiunge il giocatore con il nero
+            uniquePlayers.add(match.getWhite()); // Adds the player playing as White
+            uniquePlayers.add(match.getBlack()); // Adds the player playing as Black
         }
 
-        // Esegue la cancellazione
+        // Perform deletion
         ResponseEntity<Map<String, String>> response = super.delete(id);
 
         if (response.getStatusCode().is2xxSuccessful() && tournament.getRawMatches() != null) {
-            // Aggiornamento Campi Player
+            // Update Player Fields
             for (String player : uniquePlayers) {
                 userUpdateService.updateFields(player);
             }
@@ -143,21 +141,21 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
 
         DocumentTournament tournament = optionalTournament.get();
 
-        // Verifica che rawMatches non sia null
+        // Check that rawMatches is not null
         if (tournament.getRawMatches() == null || tournament.getRawMatches().isEmpty()) {
             return ResponseEntity.badRequest().body(tournament);
         }
 
-        // Parsiamo il parametro match per ottenere White e Black
+        // Parse the match parameter to obtain White and Black
         String[] players = match.split("-");
         if (players.length != 2) {
-            return ResponseEntity.badRequest().build(); // Formato non valido
+            return ResponseEntity.badRequest().build(); // Invalid format
         }
 
         String whitePlayer = players[0];
         String blackPlayer = players[1];
 
-        // Cerca il match da eliminare
+        // Find the match to delete
         DocumentMatch matchToRemove = null;
         for (DocumentMatch m : tournament.getRawMatches()) {
             if (m.getWhite().equals(whitePlayer) && m.getBlack().equals(blackPlayer)) {
@@ -166,24 +164,19 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
             }
         }
 
-        // Se il match non viene trovato, ritorna un errore
+        // If the match is not found, return an error
         if (matchToRemove == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(tournament);
         }
 
-        // Rimuove il match trovato
+        // Remove the found match
         tournament.getRawMatches().remove(matchToRemove);
-        repository.save(tournament); // Salva il torneo aggiornato
+        repository.save(tournament); // Save the updated tournament
 
-        // Aggiorna le statistiche dei giocatori coinvolti
+        // Update statistics for the involved players
         userUpdateService.updateFields(whitePlayer);
         userUpdateService.updateFields(blackPlayer);
 
         return ResponseEntity.ok(tournament);
     }
-
-
 }
-
-
-

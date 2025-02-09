@@ -1,8 +1,9 @@
 package it.unipi.enPassant.service.redisService;
+
 import it.unipi.enPassant.model.requests.redisModel.Request;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 @Service
 public class RequestService {
@@ -11,82 +12,88 @@ public class RequestService {
     private static final String MAX_PROGRESSIVE_KEY = "Request:max_progressive";
     private static final String REQUEST_PREFIX = "Request:progressive_number:";
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final JedisPool jedisPool;
 
-    // Inizializza i progressivi se non esistono
+    public RequestService(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
+    }
+
+    // Initialize progressive counters if they do not exist
     private void initializeProgressives() {
-        if (redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY) == null) {
-            redisTemplate.opsForValue().set(MIN_PROGRESSIVE_KEY, 1L);
-        }
-        if (redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY) == null) {
-            redisTemplate.opsForValue().set(MAX_PROGRESSIVE_KEY, 0L);
+        try (Jedis jedis = jedisPool.getResource()) {
+            if (jedis.get(MIN_PROGRESSIVE_KEY) == null) {
+                jedis.set(MIN_PROGRESSIVE_KEY, "1");
+            }
+            if (jedis.get(MAX_PROGRESSIVE_KEY) == null) {
+                jedis.set(MAX_PROGRESSIVE_KEY, "0");
+            }
         }
     }
 
-    // Aggiungere una nuova richiesta (in coda)
+    // Add a new request (to the queue)
     public Long addRequest(Request request) {
         initializeProgressives();
 
-        Long maxProgressive = redisTemplate.opsForValue().increment(MAX_PROGRESSIVE_KEY);
-        String key = REQUEST_PREFIX + maxProgressive;
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long maxProgressive = jedis.incr(MAX_PROGRESSIVE_KEY);
+            String key = REQUEST_PREFIX + maxProgressive;
 
-        redisTemplate.opsForValue().set(key, request);
-        System.out.println(key);
-        return maxProgressive;
-    }
-
-    // Leggere ed eliminare la richiesta più vecchia (in testa)
-    public Request consumeNextRequest() {
-        initializeProgressives(); // Assicura che i progressivi esistano
-
-        // Recupera i progressivi come String
-        Long minProgressive = redisTemplate.opsForValue().increment(MIN_PROGRESSIVE_KEY);
-
-        System.out.println("DEBUG: minProgressive = " + minProgressive);
-
-        String key = REQUEST_PREFIX + (minProgressive-1);
-        System.out.println("DEBUG: Recupero la richiesta con chiave: " + key);
-
-        Request request = (Request) redisTemplate.opsForValue().get(key);
-
-        if (request != null) {
-            System.out.println("DEBUG: Richiesta trovata: " + request);
-            redisTemplate.delete(key); // Elimina la richiesta dalla coda
-            System.out.println("DEBUG: Richiesta eliminata. Nuovo minProgressive: " +
-                    redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY));
-        } else {
-            System.out.println("DEBUG: Coda vuota, tutte le richieste sono state revisionate.");
-
-            redisTemplate.opsForValue().set(MIN_PROGRESSIVE_KEY, 1L);
-            redisTemplate.opsForValue().set(MAX_PROGRESSIVE_KEY, 0L);
-            System.out.println("DEBUG: Progressivi resettati.");
-
-            return new Request("NO_REQUEST", "All requests have been reviewed.");
+            jedis.set(key, request.toString());  // Convert the object to a string (JSON recommended)
+            System.out.println(key);
+            return maxProgressive;
         }
-
-        return request;
     }
 
+    // Read and remove the oldest request (from the front of the queue)
+    public Request consumeNextRequest() {
+        initializeProgressives();
 
-    // Controllare il numero di richieste ancora in coda
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long minProgressive = jedis.incr(MIN_PROGRESSIVE_KEY);
+            System.out.println("DEBUG: minProgressive = " + minProgressive);
+
+            String key = REQUEST_PREFIX + (minProgressive - 1);
+            System.out.println("DEBUG: Retrieving request with key: " + key);
+
+            String requestData = jedis.get(key);
+            if (requestData != null) {
+                System.out.println("DEBUG: Request found: " + requestData);
+                jedis.del(key); // Delete the request from the queue
+                System.out.println("DEBUG: Request deleted. New minProgressive: " + jedis.get(MIN_PROGRESSIVE_KEY));
+
+                return new Request("REQUEST_FOUND", requestData);
+            } else {
+                System.out.println("DEBUG: Queue empty, all requests have been processed.");
+
+                jedis.set(MIN_PROGRESSIVE_KEY, "1");
+                jedis.set(MAX_PROGRESSIVE_KEY, "0");
+                System.out.println("DEBUG: Progressives reset.");
+
+                return new Request("NO_REQUEST", "All requests have been reviewed.");
+            }
+        }
+    }
+
+    // Check the number of requests still in the queue
     public Long getQueueSize() {
         initializeProgressives();
 
-        // Recupera i progressivi e li converte correttamente in Long
-        Long minProgressive = redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY) != null ?
-                Long.parseLong(redisTemplate.opsForValue().get(MIN_PROGRESSIVE_KEY).toString()) : 1L;
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long minProgressive = jedis.get(MIN_PROGRESSIVE_KEY) != null ?
+                    Long.parseLong(jedis.get(MIN_PROGRESSIVE_KEY)) : 1L;
 
-        Long maxProgressive = redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY) != null ?
-                Long.parseLong(redisTemplate.opsForValue().get(MAX_PROGRESSIVE_KEY).toString()) : 0L;
+            Long maxProgressive = jedis.get(MAX_PROGRESSIVE_KEY) != null ?
+                    Long.parseLong(jedis.get(MAX_PROGRESSIVE_KEY)) : 0L;
 
-        // Assicuriamoci che il valore restituito sia sempre >= 0
-        return Math.max(0, maxProgressive - minProgressive + 1);
+            return Math.max(0, maxProgressive - minProgressive + 1);
+        }
     }
 
-    // 🔹 Resettare la coda
+    // Reset the queue
     public void resetQueue() {
-        redisTemplate.delete(MIN_PROGRESSIVE_KEY);
-        redisTemplate.delete(MAX_PROGRESSIVE_KEY);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.del(MIN_PROGRESSIVE_KEY);
+            jedis.del(MAX_PROGRESSIVE_KEY);
+        }
     }
 }

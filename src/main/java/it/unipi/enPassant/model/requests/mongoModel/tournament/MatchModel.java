@@ -42,10 +42,9 @@ public class MatchModel {
     @JsonProperty("duration")
     private double duration;
 
-    // Costruttore vuoto
     public MatchModel() {}
 
-    // Costruttore con parametri
+
     public MatchModel(int date, String whitePlayer, String blackPlayer,
                       String eco, String result, String category, List<String> moves,
                       String winner, String timestamp, double duration) {

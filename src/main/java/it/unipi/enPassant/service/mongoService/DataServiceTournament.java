@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class DataServiceTournament {
     @Autowired
     private TournamentRepository tournamentRepository;
-    // @Autowire ai servizi che ci servono per mongo e redis
+
     public List<TournamentModel> tournamentGetList() {
         List<DocumentTournament> lista = tournamentRepository.findAll();
 
