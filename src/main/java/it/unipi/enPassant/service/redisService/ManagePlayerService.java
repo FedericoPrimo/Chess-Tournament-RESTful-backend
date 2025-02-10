@@ -1,5 +1,8 @@
 package it.unipi.enPassant.service.redisService;
 
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisCluster;
 
@@ -13,9 +16,11 @@ public class ManagePlayerService {
     private static final String REGISTERED_PLAYERS_KEY = "registered_players";
 
     private final JedisCluster jedisCluster;
+    private final MongoTemplate mongoTemplate;
 
-    public ManagePlayerService(JedisCluster jedisCluster) {
+    public ManagePlayerService(JedisCluster jedisCluster, MongoTemplate mongoTemplate) {
         this.jedisCluster = jedisCluster;
+        this.mongoTemplate = mongoTemplate;
     }
 
     /* DISQUALIFIED PLAYER SECTION */
@@ -37,6 +42,15 @@ public class ManagePlayerService {
 
     /* ENROLL CATEGORY SECTION */
     public void registerPlayer(String playerId, String category) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(playerId).and("state").is(1));
+
+        boolean isDisqualified = mongoTemplate.exists(query, "user");
+
+        if (isDisqualified) {
+            return;
+        }
         jedisCluster.hset(REGISTERED_PLAYERS_KEY, playerId, category);
     }
 
@@ -52,3 +66,5 @@ public class ManagePlayerService {
         return jedisCluster.hgetAll(REGISTERED_PLAYERS_KEY);
     }
 }
+
+
