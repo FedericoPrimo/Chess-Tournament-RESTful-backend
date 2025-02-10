@@ -1,9 +1,7 @@
 package it.unipi.enPassant.service.mongoService;
 
 import it.unipi.enPassant.model.requests.mongoModel.tournament.UserMatchUpdateModel;
-import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.repositories.TournamentRepository;
-import it.unipi.enPassant.repositories.UserRepository;
 import it.unipi.enPassant.repositories.UserUpdateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,14 +15,12 @@ import java.util.List;
 public class UserUpdateService {
     private final UserUpdateRepository userUpdateRepository;
     private final TournamentRepository tournamentRepository;
-    private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserUpdateService.class);
 
     @Autowired
-    public UserUpdateService(UserUpdateRepository userUpdateRepository, TournamentRepository tournamentRepository, UserRepository userRepository) {
+    public UserUpdateService(UserUpdateRepository userUpdateRepository, TournamentRepository tournamentRepository) {
         this.userUpdateRepository = userUpdateRepository;
         this.tournamentRepository = tournamentRepository;
-        this.userRepository = userRepository;
     }
 
     public void updateFields(String username) {

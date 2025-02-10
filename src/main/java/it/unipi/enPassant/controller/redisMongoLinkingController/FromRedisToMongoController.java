@@ -55,7 +55,7 @@ public class FromRedisToMongoController {
             if (user instanceof String userId) {
                 System.out.println(userId);
                 Query query = new Query(Criteria.where("_id").is(userId));
-                Update update = new Update().set("state", 1);
+                Update update = new Update().set("status", 1);
                 mongoTemplate.updateFirst(query, update, "user");
             }
         }
@@ -178,7 +178,6 @@ public class FromRedisToMongoController {
 
         List<DocumentMatch> newRawMatches = new ArrayList<>();
         int currentYear = Year.now().getValue();
-        String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         for (String matchId : liveMatches) {
             // Here we manage every Live Match separetly
@@ -219,14 +218,6 @@ public class FromRedisToMongoController {
             System.out.println(winner);
             match.setEco(ECO);
             System.out.println(ECO);
-
-            /*int whiteelo = retrieveELOUserInformation(users[0]);
-            match.setWhiteElo(whiteelo);
-            System.out.println(whiteelo);
-
-            int blackelo = retrieveELOUserInformation(users[1]);
-            match.setBlackElo(blackelo);
-            System.out.println(blackelo);*/
 
             String result = computeResult(users[0],users[1],winner);
             match.setResult(result);
@@ -274,17 +265,6 @@ public class FromRedisToMongoController {
         if(Objects.equals(white, winner)) return "1-0";
         else if (Objects.equals(black, winner)) return "0-1";
         else return "0.5-0.5";
-    }
-
-    private int retrieveELOUserInformation(String user) {
-        Query query = new Query(Criteria.where("_id").is(user));
-        Document userDoc = mongoTemplate.findOne(query, Document.class, "user");
-
-        if (userDoc != null && userDoc.containsKey("ELO")) {
-            return userDoc.getInteger("ELO");
-        }
-
-        return 0;
     }
 
     // This is the last core function here we garantee data integrity updating the user document everytime we insert
