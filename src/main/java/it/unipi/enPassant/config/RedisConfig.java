@@ -15,7 +15,8 @@ public class RedisConfig {
 
     @Bean
     public JedisCluster jedisCluster() {
-        // Cluster nodes definition
+
+        // Cluster Nodes definition
         Set<HostAndPort> clusterNodes = new HashSet<HostAndPort>();
         clusterNodes.add(new HostAndPort("10.1.1.62", 7001));
         clusterNodes.add(new HostAndPort("10.1.1.66", 7001));
@@ -26,7 +27,7 @@ public class RedisConfig {
                 .socketTimeoutMillis(2000) // Timeout socket (2 secondi)
                 .build();
 
-        // Conection pools definition
+        // Connection pool configuration
         GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
         poolConfig.setMaxTotal(10);
         poolConfig.setMaxIdle(5);
@@ -35,7 +36,7 @@ public class RedisConfig {
         poolConfig.setTestOnReturn(true);
         poolConfig.setJmxEnabled(false);
 
-        // Cluster Creation
+        // Cluster creation
         return new JedisCluster(clusterNodes, clientConfig, poolConfig, Duration.ofSeconds(2), 5, Duration.ofSeconds(2));
     }
 }
