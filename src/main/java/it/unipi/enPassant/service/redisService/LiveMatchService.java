@@ -7,7 +7,6 @@ import redis.clients.jedis.JedisPool;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class LiveMatchService {
@@ -82,20 +81,20 @@ public class LiveMatchService {
             // Extract user1 and user2 from matchId
             String[] users = matchId.split("-");
             if (users.length != 2) {
-                return false; // Invalid matchId format
+                return false;
             }
             String user1 = users[0];
             String user2 = users[1];
 
             // Check if the user is part of the match
             if (!user.equals(user1) && !user.equals(user2)) {
-                return false; // User is not part of the match
+                return false;
             }
 
             // Check if it is the user's turn
             boolean isUser1Turn = (currentProgressive % 2 == 1);
             if ((user.equals(user1) && !isUser1Turn) || (user.equals(user2) && isUser1Turn)) {
-                return false; // Not the user's turn
+                return false;
             }
 
             moves = currentProgressive + "." + moves;

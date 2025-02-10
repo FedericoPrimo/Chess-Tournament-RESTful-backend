@@ -5,8 +5,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Set;;
 
 @Service
 public class ManagePlayerService {
