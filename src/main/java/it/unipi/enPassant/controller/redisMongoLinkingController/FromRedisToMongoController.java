@@ -2,6 +2,7 @@ package it.unipi.enPassant.controller.redisMongoLinkingController;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.repositories.TournamentRepository;
+import it.unipi.enPassant.service.redisService.ClusterFlush;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import it.unipi.enPassant.service.redisService.RequestService;
@@ -41,6 +42,9 @@ public class FromRedisToMongoController {
     @Autowired
     private TournamentRepository repository;
 
+    @Autowired
+    private ClusterFlush clusterFlush;
+
     private List<String> blitzPlayers;
     private List<String> openPlayers;
     private List<String> rapidPlayers;
@@ -78,12 +82,7 @@ public class FromRedisToMongoController {
         updateTournamentsWithLiveMatches();
 
         // 5. Flush Key Value DB the information that contains now are  no more rilevant
-        try (Jedis jedis = new Jedis("localhost", 6379)) {
-            jedis.flushDB(); // Cancella il database attuale di Redis
-            System.out.println("Redis database flushed.");
-        } catch (Exception e) {
-            System.err.println("Error while flushing Redis: " + e.getMessage());
-        }
+        clusterFlush.flushClusterDB();
     }
 
     // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
@@ -189,6 +188,12 @@ public class FromRedisToMongoController {
             String endTime = matchDetails.get("endTime");
             String winner = matchDetails.get("winner");
             String ECO = matchDetails.get("ECO");
+
+            if (winner == null || winner.trim().isEmpty() ||
+                    ECO == null || ECO.trim().isEmpty() ||
+                    endTime == null || endTime.trim().isEmpty()) {
+                return;
+            }
 
             List<String> movesList = liveMatchService.retrieveMovesList(matchId);
 

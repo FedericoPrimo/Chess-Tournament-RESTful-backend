@@ -47,10 +47,10 @@ public class LiveMatchService {
 
     public void removeLiveMatch(String matchId) {
         jedisCluster.srem(LIVE_MATCHES_KEY, matchId);
-        jedisCluster.del("Live:" + matchId + ":category",
-                "Live:" + matchId + ":startingTime",
-                "Live:" + matchId + ":progressive",
-                "Live:" + matchId + ":moveList");
+        jedisCluster.del("Live:" + matchId + ":category");
+        jedisCluster.del("Live:" + matchId + ":startingTime");
+        jedisCluster.del("Live:" + matchId + ":progressive");
+        jedisCluster.del("Live:" + matchId + ":moveList");
     }
 
     public Boolean addMoves(String moves, String user, String matchId) {
