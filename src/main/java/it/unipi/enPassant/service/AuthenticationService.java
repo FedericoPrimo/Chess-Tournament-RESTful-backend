@@ -20,12 +20,11 @@ import java.util.stream.Collectors;
 @Service
 public class AuthenticationService implements UserDetailsService {
   private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder; //
+
 
   @Autowired
-  public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public AuthenticationService(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder; //
   }
 
   @Override
@@ -51,30 +50,11 @@ public class AuthenticationService implements UserDetailsService {
     );
   }
 
-  public void createUser(DocumentUser user) {
-
-
-  }
-
   public boolean userExists(String username) {
     DocumentUser user = userRepository.findByUsername(username);
     return user != null;
   }
 
-  @Transactional
-  public void migratePasswords() {
-    // Recupera gli utenti con type "2" e "0"
-    List<DocumentUser> users = userRepository.findAll();
-    for (DocumentUser user : users) {
-      String currentPassword = user.getPassword();
-      // Opzionale: controlla se la password non è già stata hashata (nel caso di BCrypt, l'hash inizia con "$2a$", "$2b$" o "$2y$")
-      if (!currentPassword.startsWith("$2a$") && !currentPassword.startsWith("$2b$") && !currentPassword.startsWith("$2y$")) {
-        String hashedPassword = passwordEncoder.encode(currentPassword);
-        user.setPassword(hashedPassword);
-        userRepository.save(user);
-      }
-    }
-    System.out.println("Password migration completed");
-  }
+
 }
 

@@ -58,7 +58,7 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             // Set security rules
-            /*
+
             .authorizeHttpRequests(auth -> auth
                       .requestMatchers("/api/player/login").permitAll()
                       .requestMatchers("/api/manager/login").permitAll()
@@ -97,10 +97,6 @@ public class SecurityConfig {
                       .requestMatchers("/api/tournament/matchMacking/**").hasAuthority("0")
                       .anyRequest().authenticated()
               )
-            */
-            .authorizeHttpRequests(auth -> auth
-                    .anyRequest().permitAll()
-            )
 
             // Disable form login and HTTP Basic authentication since we are using JWT
             .formLogin(form -> form.disable())

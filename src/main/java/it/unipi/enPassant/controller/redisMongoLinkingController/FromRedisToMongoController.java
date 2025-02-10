@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.Jedis;
 import org.bson.Document;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -67,6 +66,13 @@ public class FromRedisToMongoController {
         // 3. Get enrolled players
         Map<String, String> enrolled = managePlayerService.getAllRegisteredPlayers();
         categorizePlayers(enrolled);
+        System.out.println("Enrolled players:");
+        for (Map.Entry<String, String> entry : enrolled.entrySet()) {
+            System.out.println("Player ID: " + entry.getKey() + ", Category: " + entry.getValue());
+        }System.out.println("Enrolled players:");
+        for (Map.Entry<String, String> entry : enrolled.entrySet()) {
+            System.out.println("Player ID: " + entry.getKey() + ", Category: " + entry.getValue());
+        }
         System.out.println(blitzPlayers);
         if (!blitzPlayers.isEmpty()) {
             manageTournamentRegistration("Blitz", blitzPlayers);
