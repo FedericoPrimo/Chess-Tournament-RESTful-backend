@@ -18,4 +18,9 @@ public class Request implements Serializable {
 
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
+
+    @Override
+    public String toString() {
+        return "{ \"nomeUtente\": \"" + nomeUtente + "\", \"text\": \"" + text + "\" }";
+    }
 }

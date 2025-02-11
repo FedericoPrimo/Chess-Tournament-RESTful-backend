@@ -96,27 +96,14 @@ public class LiveMatchService {
         writeWithConsistency("Live:" + matchId + ":ECO", ECO);
     }
 
-    /**
-     * Writes a value to multiple replicas to ensure strong consistency.
-     * The value is stored in multiple keys with a replication suffix.
-     *
-     * @param key   The base key to write.
-     * @param value The value to be stored.
-     */
+
     private void writeWithConsistency(String key, String value) {
         for (int i = 0; i < REPLICATION_FACTOR; i++) {
             jedisCluster.set(key + ":replica" + i, value);
         }
     }
 
-    /**
-     * Reads a value from multiple replicas and returns the most consistent one.
-     * The function verifies if at least a majority of the replicas contain the same value
-     * before considering the read operation successful.
-     *
-     * @param key The base key to read.
-     * @return The most agreed-upon value or null if consensus is not reached.
-     */
+
     private String readWithConsistency(String key) {
         Map<String, Integer> valuesCount = new HashMap<>();
         for (int i = 0; i < REPLICATION_FACTOR; i++) {

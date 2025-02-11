@@ -1,6 +1,7 @@
 package it.unipi.enPassant.controller.redisMongoLinkingController;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
+import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import it.unipi.enPassant.service.redisService.ClusterFlush;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,8 +53,8 @@ public class FromRedisToMongoController {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping
-    public void appUpdate() {
-        // 2. Get disqualified players and update MongoDB player status
+    public ResponseEntity<List<Request>> appUpdate() {
+        // 1. Get disqualified players and update MongoDB player status
         Set<String> disqualified = managePlayerService.getAllDisqualifiedPlayers();
         for (Object user : disqualified) {
             if (user instanceof String userId) {
@@ -63,7 +65,7 @@ public class FromRedisToMongoController {
             }
         }
 
-        // 3. Get enrolled players
+        // 2. Get enrolled players
         Map<String, String> enrolled = managePlayerService.getAllRegisteredPlayers();
         categorizePlayers(enrolled);
         System.out.println("Enrolled players:");
@@ -84,11 +86,16 @@ public class FromRedisToMongoController {
             manageTournamentRegistration("Rapid", rapidPlayers);
         }
 
-        // 4. Get live match
+        // 3. Get live match and update
         updateTournamentsWithLiveMatches();
+
+        //4. Retrive pending request
+        List<Request> pendingRequests = getAllPendingRequests();
 
         // 5. Flush Key Value DB the information that contains now are  no more rilevant
         clusterFlush.flushClusterDB();
+
+        return ResponseEntity.ok(pendingRequests);
     }
 
     // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
@@ -364,4 +371,15 @@ public class FromRedisToMongoController {
         mongoTemplate.updateFirst(query, update, "user");
     }
 
+    private List<Request> getAllPendingRequests() {
+        List<Request> requests = new ArrayList<>();
+
+        while (requestService.getQueueSize() > 0) {
+            Request request = requestService.consumeNextRequest();
+            if (request.getNomeUtente() != null && !request.getNomeUtente().isEmpty()) {
+                requests.add(request);
+            }
+        }
+        return requests;
+    }
 }
