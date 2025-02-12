@@ -1,6 +1,7 @@
 package it.unipi.enPassant.controller.redisMongoLinkingController;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
+import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
 import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import it.unipi.enPassant.service.redisService.ClusterFlush;
@@ -180,10 +181,10 @@ public class FromRedisToMongoController {
     //this function use the ausiliar function calculateDuration(), retrieveUserInformation() and updateUserInformation()
     // in order to keep the code as much modular as possible
     private void updateTournamentsWithLiveMatches() {
-        System.out.println("Retrieve Live Matches from Redis");
-        List<String> liveMatches = liveMatchService.getLiveMatches();
+        System.out.println("Retrieving Live Matches from Redis");
+        List<String> liveMatchIds = liveMatchService.getLiveMatches();
 
-        if (liveMatches.isEmpty()) {
+        if (liveMatchIds.isEmpty()) {
             System.out.println("No Live Matches found!");
             return;
         }
@@ -191,55 +192,45 @@ public class FromRedisToMongoController {
         List<DocumentMatch> newRawMatches = new ArrayList<>();
         int currentYear = Year.now().getValue();
 
-        for (String matchId : liveMatches) {
-            // Here we manage every Live Match separetly
-            Map<String, String> matchDetails = liveMatchService.getMatchDetails(matchId);
-            if (matchDetails.isEmpty()) continue;
-            System.out.println(matchId);
-            String category = matchDetails.get("category");
-            String startingTime = matchDetails.get("startingTime");
-            String endTime = matchDetails.get("endTime");
-            String winner = matchDetails.get("winner");
-            String ECO = matchDetails.get("ECO");
+        for (String matchId : liveMatchIds) {
+            LiveMatch liveMatch = liveMatchService.getMatchDetails(matchId);
+            if (liveMatch == null) continue;
+
+            System.out.println("Processing match: " + matchId);
+
+            String category = liveMatch.getCategory();
+            String startingTime = liveMatch.getStartingTime();
+            String endTime = liveMatch.getEndTime();
+            String winner = liveMatch.getWinner();
+            String ECO = liveMatch.getECO();
 
             if (winner == null || winner.trim().isEmpty() ||
                     ECO == null || ECO.trim().isEmpty() ||
                     endTime == null || endTime.trim().isEmpty()) {
-                return;
+                continue;
             }
 
             List<String> movesList = liveMatchService.retrieveMovesList(matchId);
-
-
             DocumentMatch match = new DocumentMatch();
 
-            // Retrieve White and Black by matchId that by convection is user1-user2
             String[] users = matchId.split("-");
-
             if (users.length == 2) {
-                match.setWhite(users[0]); // White player
-                match.setBlack(users[1]); // Black player
+                match.setWhite(users[0]);
+                match.setBlack(users[1]);
             } else {
-                System.out.println("MatchId is a wrong format: " + matchId);
+                System.out.println("Invalid matchId format: " + matchId);
                 continue;
             }
-            // Some print in order to help in case of debug or something goes wrong (Hopefully, these prints are only aesthetics  )
-            match.setCategory(category);
-            System.out.println(category);
-            match.setTimestamp(startingTime);
-            System.out.println(startingTime);
-            match.setMoves(movesList);
-            System.out.println(movesList);
-            match.setDate(currentYear);
-            System.out.println(currentYear);
-            match.setWinner(winner);
-            System.out.println(winner);
-            match.setEco(ECO);
-            System.out.println(ECO);
 
-            String result = computeResult(users[0],users[1],winner);
+            match.setCategory(category);
+            match.setTimestamp(startingTime);
+            match.setMoves(movesList);
+            match.setDate(currentYear);
+            match.setWinner(winner);
+            match.setEco(ECO);
+
+            String result = computeResult(users[0], users[1], winner);
             match.setResult(result);
-            System.out.println(result);
 
             if (startingTime != null && endTime != null) {
                 match.setDuration(calculateDuration(startingTime, endTime));
@@ -247,28 +238,22 @@ public class FromRedisToMongoController {
 
             newRawMatches.add(match);
 
-            // Retrive the Tournament in which make the insert of the match
-            Query query = new Query();
-            query.addCriteria(Criteria.where("Edition").is(currentYear).and("Category").is(category));
-
+            Query query = new Query(Criteria.where("Edition").is(currentYear).and("Category").is(category));
             DocumentTournament tournament = mongoTemplate.findOne(query, DocumentTournament.class);
 
             if (tournament != null) {
-
                 if (tournament.getRawMatches() == null) {
                     tournament.setRawMatches(new ArrayList<>());
                 }
-
                 tournament.getRawMatches().add(match);
-
                 repository.save(tournament);
-                System.out.println("Live match " + matchId + " added succesfully in  " + category);
+                System.out.println("Live match " + matchId + " successfully added to " + category);
             } else {
-                System.out.println("There is no Tournament for this category: " + category);
+                System.out.println("No tournament found for category: " + category);
             }
+
             updateUserInformation(match);
         }
-
     }
 
     private double calculateDuration(String start, String end) { //* modificato per restituire un double
