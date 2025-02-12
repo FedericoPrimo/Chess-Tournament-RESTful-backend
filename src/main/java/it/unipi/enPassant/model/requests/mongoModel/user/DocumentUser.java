@@ -14,7 +14,7 @@ public class DocumentUser {
     private String Surname;
     private String Type;
     private int ELO;
-    private Boolean State; // True if the player is disqualified
+    private Boolean Status; // True if the player is disqualified
     private List<DocumentMatchUser> Matches;
 
 
@@ -28,7 +28,7 @@ public class DocumentUser {
     public DocumentUser() {}
 
     public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
-                        String Type, int ELO, boolean State, List<DocumentMatchUser> Matches,
+                        String Type, int ELO, boolean Status, List<DocumentMatchUser> Matches,
                         int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
                         int NumberOfDraws, double avgMovesNumber) {
         this.id = Id;
@@ -38,7 +38,7 @@ public class DocumentUser {
         this.Surname = Surname;
         this.Type = Type;
         this.ELO = ELO;
-        this.State = State;
+        this.Status = Status;
         this.Matches = Matches;
         this.NumberOfPlayedMatches = NumberOfPlayedMatches;
         this.NumberOfVictories = NumberOfVictories;
@@ -58,7 +58,7 @@ public class DocumentUser {
         this.Surname = Surname;
         this.Type = Type;
         this.ELO = ELO;
-        this.State = null;
+        this.Status = Boolean.FALSE;
         this.Matches = Matches;
         this.NumberOfPlayedMatches = NumberOfPlayedMatches;
         this.NumberOfVictories = NumberOfVictories;
@@ -66,6 +66,23 @@ public class DocumentUser {
         this.NumberOfDraws = NumberOfDraws;
         this.avgMovesNumber = avgMovesNumber;
     }
+
+    /*public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname, String Type) {
+        this.id = Id;
+        this.BirthDate = BirthDate;
+        this.Name = Name;
+        this.Password = Password;
+        this.Surname = Surname;
+        this.Type = Type;
+        this.Status = Boolean.FALSE;
+        this.ELO = 0;
+        this.Matches = null;
+        this.NumberOfPlayedMatches = 0;
+        this.NumberOfVictories = 0;
+        this.NumberOfDefeats = 0;
+        this.NumberOfDraws = 0;
+        this.avgMovesNumber = 0.0;
+    }*/
 
     // Getter & Setter
     public String getid() {
@@ -124,12 +141,12 @@ public class DocumentUser {
         this.ELO = ELO;
     }
 
-    public boolean isState() {
-        return State;
+    public boolean isStatus() {
+        return Status;
     }
 
-    public void setState(boolean State) {
-        this.State = State;
+    public void setStatus(boolean Status) {
+        this.Status = Status;
     }
 
     public List<DocumentMatchUser> getMatches() {

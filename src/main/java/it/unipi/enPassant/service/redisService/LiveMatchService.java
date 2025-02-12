@@ -1,5 +1,8 @@
 package it.unipi.enPassant.service.redisService;
 
+import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisCluster;
 
@@ -10,100 +13,120 @@ import java.util.*;
 @Service
 public class LiveMatchService {
     private static final String LIVE_MATCHES_KEY = "Live:matches";
+    private static final int REPLICATION_FACTOR = 2; // Number of copies for consistency
     private final JedisCluster jedisCluster;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public LiveMatchService(JedisCluster jedisCluster) {
         this.jedisCluster = jedisCluster;
     }
 
-    // Initialize progressive move key if it does not exist
-    private void initializeProgressiveMoveKey(String matchId) {
-        String progressiveKey = "Live:" + matchId + ":progressive";
-        if (jedisCluster.get(progressiveKey) == null) {
-            jedisCluster.set(progressiveKey, "1");
+    public void addLiveMatch(String matchId, String category, String startingTime) {
+        try {
+            LiveMatch liveMatch = new LiveMatch(category, startingTime);
+            String matchJson = objectMapper.writeValueAsString(liveMatch);
+            writeWithConsistency("Live:" + matchId, matchJson);
+            jedisCluster.sadd(LIVE_MATCHES_KEY, matchId);
+            initializeProgressiveMoveKey(matchId);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializing LiveMatch", e);
         }
     }
 
-    // Add a live match to the Redis set and store its details
-    public void addLiveMatch(String matchId, String category, String startingTime) {
-        jedisCluster.sadd(LIVE_MATCHES_KEY, matchId);
-        jedisCluster.set("Live:" + matchId + ":category", category);
-        jedisCluster.set("Live:" + matchId + ":startingTime", startingTime);
-        initializeProgressiveMoveKey(matchId);
-    }
-
-    // Retrieve the list of live matches
     public List<String> getLiveMatches() {
         return new ArrayList<>(jedisCluster.smembers(LIVE_MATCHES_KEY));
     }
 
-    // Retrieve match details from Redis
-    public Map<String, String> getMatchDetails(String matchId) {
-        Map<String, String> details = new HashMap<>();
-        details.put("category", jedisCluster.get("Live:" + matchId + ":category"));
-        details.put("startingTime", jedisCluster.get("Live:" + matchId + ":startingTime"));
-        details.put("winner", jedisCluster.get("Live:" + matchId + ":winner"));
-        details.put("endTime", jedisCluster.get("Live:" + matchId + ":endTime"));
-        details.put("ECO", jedisCluster.get("Live:" + matchId + ":ECO"));
-        return details;
+    public LiveMatch getMatchDetails(String matchId) {
+        try {
+            String matchJson = readWithConsistency("Live:" + matchId);
+            return matchJson != null ? objectMapper.readValue(matchJson, LiveMatch.class) : null;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error deserializing LiveMatch", e);
+        }
     }
 
-    // Remove a live match and its associated data from Redis
+    public void insertMatchResult(String matchId, String winner, String ECO) {
+        try {
+            String matchJson = readWithConsistency("Live:" + matchId);
+            if (matchJson != null) {
+                LiveMatch liveMatch = objectMapper.readValue(matchJson, LiveMatch.class);
+                liveMatch.setWinner(winner);
+                liveMatch.setEndTime(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                liveMatch.setECO(ECO);
+                writeWithConsistency("Live:" + matchId, objectMapper.writeValueAsString(liveMatch));
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error updating LiveMatch", e);
+        }
+    }
+
     public void removeLiveMatch(String matchId) {
+        jedisCluster.del("Live:" + matchId);
         jedisCluster.srem(LIVE_MATCHES_KEY, matchId);
-        jedisCluster.del("Live:" + matchId + ":category",
-                "Live:" + matchId + ":startingTime",
-                "Live:" + matchId + ":progressive",
-                "Live:" + matchId + ":moveList");
     }
 
-    // Add a move to the match while ensuring turn order
     public Boolean addMoves(String moves, String user, String matchId) {
         String progressiveKey = "Live:" + matchId + ":progressive";
         String moveListKey = "Live:" + matchId + ":moveList";
         initializeProgressiveMoveKey(matchId);
 
-        Long currentProgressive = jedisCluster.get(progressiveKey) != null ?
-                Long.parseLong(jedisCluster.get(progressiveKey)) : 0L;
+        Long currentProgressive = readWithConsistency(progressiveKey) != null ?
+                Long.parseLong(readWithConsistency(progressiveKey)) : 0L;
 
-        // Extract user1 and user2 from matchId
         String[] users = matchId.split("-");
         if (users.length != 2) {
-            return false; // Invalid matchId format
+            return false;
         }
         String user1 = users[0];
         String user2 = users[1];
 
-        // Check if the user is part of the match
         if (!user.equals(user1) && !user.equals(user2)) {
-            return false; // User is not part of the match
+            return false;
         }
 
-        // Check if it is the user's turn
         boolean isUser1Turn = (currentProgressive % 2 == 1);
         if ((user.equals(user1) && !isUser1Turn) || (user.equals(user2) && isUser1Turn)) {
-            return false; // Not the user's turn
+            return false;
         }
 
         moves = currentProgressive + "." + moves;
-        // Increment the progressive counter and save the move
-        jedisCluster.set(progressiveKey, String.valueOf(currentProgressive + 1));
+        writeWithConsistency(progressiveKey, String.valueOf(currentProgressive + 1));
         jedisCluster.rpush(moveListKey, moves);
         return true;
     }
 
-    // Retrieve the list of moves for a specific match
     public List<String> retrieveMovesList(String matchId) {
         String moveListKey = "Live:" + matchId + ":moveList";
         List<String> moves = jedisCluster.lrange(moveListKey, 0, -1);
         return moves != null ? moves : new ArrayList<>();
     }
 
-    // Insert the result of a match into Redis
-    public void insertMatchResult(String matchId, String winner, String ECO) {
-        String endTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        jedisCluster.set("Live:" + matchId + ":winner", winner);
-        jedisCluster.set("Live:" + matchId + ":endTime", endTime);
-        jedisCluster.set("Live:" + matchId + ":ECO", ECO);
+    private void initializeProgressiveMoveKey(String matchId) {
+        String progressiveKey = "Live:" + matchId + ":progressive";
+        if (readWithConsistency(progressiveKey) == null) {
+            writeWithConsistency(progressiveKey, "1");
+        }
+    }
+
+    private void writeWithConsistency(String key, String value) {
+        for (int i = 0; i < REPLICATION_FACTOR; i++) {
+            jedisCluster.set(key + ":replica" + i, value);
+        }
+    }
+
+    private String readWithConsistency(String key) {
+        Map<String, Integer> valuesCount = new HashMap<>();
+        for (int i = 0; i < REPLICATION_FACTOR; i++) {
+            String value = jedisCluster.get(key + ":replica" + i);
+            if (value != null) {
+                valuesCount.put(value, valuesCount.getOrDefault(value, 0) + 1);
+            }
+        }
+        return valuesCount.entrySet().stream()
+                .filter(entry -> entry.getValue() >= REPLICATION_FACTOR / 2 + 1)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 }

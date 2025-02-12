@@ -1,5 +1,7 @@
 package it.unipi.enPassant.controller.redisController;
+
 import it.unipi.enPassant.service.redisService.LiveMatchService;
+import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,8 +53,8 @@ public class LiveMatchController {
     }
 
     @GetMapping("/matchDetails/{matchId}")
-    public ResponseEntity<Map<String, String>> getMatchDetails(@PathVariable String matchId) {
-        Map<String, String> details = liveMatchService.getMatchDetails(matchId);
+    public ResponseEntity<LiveMatch> getMatchDetails(@PathVariable String matchId) {
+        LiveMatch details = liveMatchService.getMatchDetails(matchId);
         return ResponseEntity.ok(details);
     }
 
@@ -81,7 +83,6 @@ public class LiveMatchController {
     @PostMapping("/insertMatchResult/{matchId}/{winner}/{ECO}")
     public ResponseEntity<String> insertMatchResult(@PathVariable String matchId, @PathVariable String winner, @PathVariable String ECO) {
         liveMatchService.insertMatchResult(matchId, winner, ECO);
-        return ResponseEntity.ok("Match Result of  " + matchId + " inserted successfully.");
+        return ResponseEntity.ok("Match Result of " + matchId + " inserted successfully.");
     }
 }
-

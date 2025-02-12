@@ -1,7 +1,10 @@
 package it.unipi.enPassant.controller.redisMongoLinkingController;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
+import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
+import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.repositories.TournamentRepository;
+import it.unipi.enPassant.service.redisService.ClusterFlush;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import it.unipi.enPassant.service.redisService.RequestService;
@@ -10,10 +13,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.Jedis;
 import org.bson.Document;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -41,6 +44,9 @@ public class FromRedisToMongoController {
     @Autowired
     private TournamentRepository repository;
 
+    @Autowired
+    private ClusterFlush clusterFlush;
+
     private List<String> blitzPlayers;
     private List<String> openPlayers;
     private List<String> rapidPlayers;
@@ -48,8 +54,8 @@ public class FromRedisToMongoController {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping
-    public void appUpdate() {
-        // 2. Get disqualified players and update MongoDB player status
+    public ResponseEntity<List<Request>> appUpdate() {
+        // 1. Get disqualified players and update MongoDB player status
         Set<String> disqualified = managePlayerService.getAllDisqualifiedPlayers();
         for (Object user : disqualified) {
             if (user instanceof String userId) {
@@ -60,9 +66,16 @@ public class FromRedisToMongoController {
             }
         }
 
-        // 3. Get enrolled players
+        // 2. Get enrolled players
         Map<String, String> enrolled = managePlayerService.getAllRegisteredPlayers();
         categorizePlayers(enrolled);
+        System.out.println("Enrolled players:");
+        for (Map.Entry<String, String> entry : enrolled.entrySet()) {
+            System.out.println("Player ID: " + entry.getKey() + ", Category: " + entry.getValue());
+        }System.out.println("Enrolled players:");
+        for (Map.Entry<String, String> entry : enrolled.entrySet()) {
+            System.out.println("Player ID: " + entry.getKey() + ", Category: " + entry.getValue());
+        }
         System.out.println(blitzPlayers);
         if (!blitzPlayers.isEmpty()) {
             manageTournamentRegistration("Blitz", blitzPlayers);
@@ -74,16 +87,16 @@ public class FromRedisToMongoController {
             manageTournamentRegistration("Rapid", rapidPlayers);
         }
 
-        // 4. Get live match
+        // 3. Get live match and update
         updateTournamentsWithLiveMatches();
 
+        //4. Retrive pending request
+        List<Request> pendingRequests = getAllPendingRequests();
+
         // 5. Flush Key Value DB the information that contains now are  no more rilevant
-        try (Jedis jedis = new Jedis("localhost", 6379)) {
-            jedis.flushDB(); // Cancella il database attuale di Redis
-            System.out.println("Redis database flushed.");
-        } catch (Exception e) {
-            System.err.println("Error while flushing Redis: " + e.getMessage());
-        }
+        clusterFlush.flushClusterDB();
+
+        return ResponseEntity.ok(pendingRequests);
     }
 
     // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
@@ -168,10 +181,10 @@ public class FromRedisToMongoController {
     //this function use the ausiliar function calculateDuration(), retrieveUserInformation() and updateUserInformation()
     // in order to keep the code as much modular as possible
     private void updateTournamentsWithLiveMatches() {
-        System.out.println("Retrieve Live Matches from Redis");
-        List<String> liveMatches = liveMatchService.getLiveMatches();
+        System.out.println("Retrieving Live Matches from Redis");
+        List<String> liveMatchIds = liveMatchService.getLiveMatches();
 
-        if (liveMatches.isEmpty()) {
+        if (liveMatchIds.isEmpty()) {
             System.out.println("No Live Matches found!");
             return;
         }
@@ -179,49 +192,45 @@ public class FromRedisToMongoController {
         List<DocumentMatch> newRawMatches = new ArrayList<>();
         int currentYear = Year.now().getValue();
 
-        for (String matchId : liveMatches) {
-            // Here we manage every Live Match separetly
-            Map<String, String> matchDetails = liveMatchService.getMatchDetails(matchId);
-            if (matchDetails.isEmpty()) continue;
-            System.out.println(matchId);
-            String category = matchDetails.get("category");
-            String startingTime = matchDetails.get("startingTime");
-            String endTime = matchDetails.get("endTime");
-            String winner = matchDetails.get("winner");
-            String ECO = matchDetails.get("ECO");
+        for (String matchId : liveMatchIds) {
+            LiveMatch liveMatch = liveMatchService.getMatchDetails(matchId);
+            if (liveMatch == null) continue;
 
-            List<String> movesList = liveMatchService.retrieveMovesList(matchId);
+            System.out.println("Processing match: " + matchId);
 
+            String category = liveMatch.getCategory();
+            String startingTime = liveMatch.getStartingTime();
+            String endTime = liveMatch.getEndTime();
+            String winner = liveMatch.getWinner();
+            String ECO = liveMatch.getECO();
 
-            DocumentMatch match = new DocumentMatch();
-
-            // Retrieve White and Black by matchId that by convection is user1-user2
-            String[] users = matchId.split("-");
-
-            if (users.length == 2) {
-                match.setWhite(users[0]); // White player
-                match.setBlack(users[1]); // Black player
-            } else {
-                System.out.println("MatchId is a wrong format: " + matchId);
+            if (winner == null || winner.trim().isEmpty() ||
+                    ECO == null || ECO.trim().isEmpty() ||
+                    endTime == null || endTime.trim().isEmpty()) {
                 continue;
             }
-            // Some print in order to help in case of debug or something goes wrong (Hopefully, these prints are only aesthetics  )
-            match.setCategory(category);
-            System.out.println(category);
-            match.setTimestamp(startingTime);
-            System.out.println(startingTime);
-            match.setMoves(movesList);
-            System.out.println(movesList);
-            match.setDate(currentYear);
-            System.out.println(currentYear);
-            match.setWinner(winner);
-            System.out.println(winner);
-            match.setEco(ECO);
-            System.out.println(ECO);
 
-            String result = computeResult(users[0],users[1],winner);
+            List<String> movesList = liveMatchService.retrieveMovesList(matchId);
+            DocumentMatch match = new DocumentMatch();
+
+            String[] users = matchId.split("-");
+            if (users.length == 2) {
+                match.setWhite(users[0]);
+                match.setBlack(users[1]);
+            } else {
+                System.out.println("Invalid matchId format: " + matchId);
+                continue;
+            }
+
+            match.setCategory(category);
+            match.setTimestamp(startingTime);
+            match.setMoves(movesList);
+            match.setDate(currentYear);
+            match.setWinner(winner);
+            match.setEco(ECO);
+
+            String result = computeResult(users[0], users[1], winner);
             match.setResult(result);
-            System.out.println(result);
 
             if (startingTime != null && endTime != null) {
                 match.setDuration(calculateDuration(startingTime, endTime));
@@ -229,28 +238,22 @@ public class FromRedisToMongoController {
 
             newRawMatches.add(match);
 
-            // Retrive the Tournament in which make the insert of the match
-            Query query = new Query();
-            query.addCriteria(Criteria.where("Edition").is(currentYear).and("Category").is(category));
-
+            Query query = new Query(Criteria.where("Edition").is(currentYear).and("Category").is(category));
             DocumentTournament tournament = mongoTemplate.findOne(query, DocumentTournament.class);
 
             if (tournament != null) {
-
                 if (tournament.getRawMatches() == null) {
                     tournament.setRawMatches(new ArrayList<>());
                 }
-
                 tournament.getRawMatches().add(match);
-
                 repository.save(tournament);
-                System.out.println("Live match " + matchId + " added succesfully in  " + category);
+                System.out.println("Live match " + matchId + " successfully added to " + category);
             } else {
-                System.out.println("There is no Tournament for this category: " + category);
+                System.out.println("No tournament found for category: " + category);
             }
+
             updateUserInformation(match);
         }
-
     }
 
     private double calculateDuration(String start, String end) { //* modificato per restituire un double
@@ -353,4 +356,15 @@ public class FromRedisToMongoController {
         mongoTemplate.updateFirst(query, update, "user");
     }
 
+    private List<Request> getAllPendingRequests() {
+        List<Request> requests = new ArrayList<>();
+
+        while (requestService.getQueueSize() > 0) {
+            Request request = requestService.consumeNextRequest();
+            if (request.getNomeUtente() != null && !request.getNomeUtente().isEmpty()) {
+                requests.add(request);
+            }
+        }
+        return requests;
+    }
 }

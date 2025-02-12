@@ -25,42 +25,30 @@ public class DataTournamentMatchModel
     @JsonProperty("whitePlayer")
     private String whitePlayer;
 
-    @JsonProperty("whiteElo")
-    private int whiteElo;
-
     @JsonProperty("blackPlayer")
     private String blackPlayer;
-
-    @JsonProperty("blackElo")
-    private int blackElo;
 
     @JsonProperty("eco")
     private String eco;
 
-    @JsonProperty("event")
-    private String event;
-
     @JsonProperty("result")
     private String result;
 
-    @JsonProperty("movelist")
-    private List<String> movelist;
+    @JsonProperty("moves")
+    private List<String> moves;
 
     public DataTournamentMatchModel(){}
 
-    public DataTournamentMatchModel(int edition, String category, String location, String matchDate, String whitePlayer, int whiteElo, String blackPlayer, int blackElo, String eco, String event, String result, List<String> movelist) {
+    public DataTournamentMatchModel(int edition, String category, String location, String matchDate, String whitePlayer, String blackPlayer, String eco, String result, List<String> moves) {
         this.edition = edition;
         this.category = category;
         this.location = location;
         this.matchDate = matchDate;
         this.whitePlayer = whitePlayer;
-        this.whiteElo = whiteElo;
         this.blackPlayer = blackPlayer;
-        this.blackElo = blackElo;
         this.eco = eco;
-        this.event = event;
         this.result = result;
-        this.movelist = movelist;
+        this.moves = moves;
     }
 
     public int getEdition() {
@@ -93,34 +81,17 @@ public class DataTournamentMatchModel
     public void setWhitePlayer(String whitePlayer) {
         this.whitePlayer = whitePlayer;
     }
-    public int getWhiteElo() {
-        return whiteElo;
-    }
-    public void setWhiteElo(int whiteElo) {
-        this.whiteElo = whiteElo;
-    }
     public String getBlackPlayer() {
         return blackPlayer;
     }
     public void setBlackPlayer(String blackPlayer) {
         this.blackPlayer = blackPlayer;
     }
-    public int getBlackElo() {
-        return blackElo;
-    }
-    public void setBlackElo(int blackElo) {
-        this.blackElo = blackElo;}
     public String getEco() {
         return eco;
     }
     public void setEco(String eco) {
         this.eco = eco;
-    }
-    public String getEvent() {
-        return event;
-    }
-    public void setEvent(String event) {
-        this.event = event;
     }
     public String getResult() {
         return result;
@@ -128,10 +99,10 @@ public class DataTournamentMatchModel
     public void setResult(String result) {
         this.result = result;
     }
-    public List<String> getMovelist() {
-        return movelist;
+    public List<String> getmoves() {
+        return moves;
     }
-    public void setMovelist(List<String> movelist) {
-        this.movelist = movelist;
+    public void setmoves(List<String> moves) {
+        this.moves = moves;
     }
 }
