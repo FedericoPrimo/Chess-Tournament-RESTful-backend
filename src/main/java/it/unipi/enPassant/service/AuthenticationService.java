@@ -44,7 +44,7 @@ public class AuthenticationService implements UserDetailsService {
     System.out.println("Authorities: " + authorities);
 
     return new org.springframework.security.core.userdetails.User(
-            user.getid(),
+            user.getId(),
             user.getPassword(),
             authorities
     );

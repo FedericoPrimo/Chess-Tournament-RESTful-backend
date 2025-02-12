@@ -27,7 +27,7 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
     @Aggregation(pipeline = {
             "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",
             "{ $unwind: '$RawMatches' }",
-            "{ $match: { 'RawMatches.White': ?4, 'RawMatches.Black': ?3 } }",
+            "{ $match: { 'RawMatches.White': ?3, 'RawMatches.Black': ?4 } }",
             "{ $project: {"
                     + " _id: 0,"
                     + " edition: '$Edition',"
@@ -35,16 +35,13 @@ public interface TournamentRepository extends MongoRepository<DocumentTournament
                     + " location: '$Location',"
                     + " matchDate: '$RawMatches.Date',"
                     + " whitePlayer: '$RawMatches.White',"
-                    + " whiteElo: '$RawMatches.WhiteElo',"
                     + " blackPlayer: '$RawMatches.Black',"
-                    + " blackElo: '$RawMatches.BlackElo',"
                     + " eco: '$RawMatches.ECO',"
-                    + " event: '$RawMatches.Event',"
                     + " result: '$RawMatches.Result',"
                     + " moveList: '$RawMatches.Moves'"
                     + "} }"
     })
-    DataTournamentMatchModel findMatchofTournament(int edition, String category, String location, String Black, String White);
+    DataTournamentMatchModel findMatchofTournament(int edition, String category, String location, String White, String Black);
 
     @Aggregation(pipeline = {
             "{ $unwind: '$RawMatches' }",

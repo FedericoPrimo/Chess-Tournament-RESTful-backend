@@ -31,8 +31,8 @@ public class DataServiceTournament {
         return tournamentRepository.findTournamentMatches(edition, category, location);
     }
 
-    public DataTournamentMatchModel tournamentMatchGet(String category, int edition, String location, String Black, String White) {
-        DataTournamentMatchModel tournament = tournamentRepository.findMatchofTournament(edition, category, location, Black, White);
+    public DataTournamentMatchModel tournamentMatchGet(String category, int edition, String location, String White, String Black) {
+        DataTournamentMatchModel tournament = tournamentRepository.findMatchofTournament(edition, category, location, White, Black);
         return tournament;
     }
 

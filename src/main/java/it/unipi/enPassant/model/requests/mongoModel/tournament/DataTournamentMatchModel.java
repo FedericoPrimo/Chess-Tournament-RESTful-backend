@@ -34,12 +34,12 @@ public class DataTournamentMatchModel
     @JsonProperty("result")
     private String result;
 
-    @JsonProperty("moves")
-    private List<String> moves;
+    @JsonProperty("moveList")
+    private List<String> moveList;
 
     public DataTournamentMatchModel(){}
 
-    public DataTournamentMatchModel(int edition, String category, String location, String matchDate, String whitePlayer, String blackPlayer, String eco, String result, List<String> moves) {
+    public DataTournamentMatchModel(int edition, String category, String location, String matchDate, String whitePlayer, String blackPlayer, String eco, String result, List<String> moveList) {
         this.edition = edition;
         this.category = category;
         this.location = location;
@@ -48,7 +48,7 @@ public class DataTournamentMatchModel
         this.blackPlayer = blackPlayer;
         this.eco = eco;
         this.result = result;
-        this.moves = moves;
+        this.moveList = moveList;
     }
 
     public int getEdition() {
@@ -99,10 +99,10 @@ public class DataTournamentMatchModel
     public void setResult(String result) {
         this.result = result;
     }
-    public List<String> getmoves() {
-        return moves;
+    public List<String> getmoveList() {
+        return moveList;
     }
-    public void setmoves(List<String> moves) {
-        this.moves = moves;
+    public void setmoveList(List<String> moveList) {
+        this.moveList = moveList;
     }
 }

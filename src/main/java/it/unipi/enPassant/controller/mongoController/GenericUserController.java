@@ -69,7 +69,7 @@ public abstract class GenericUserController {
   protected ResponseEntity<String> register(@RequestBody DocumentUser userModel) {
     try {
       // Check if the user already exists
-      if (authservice.userExists(userModel.getid())) {
+      if (authservice.userExists(userModel.getId())) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
       }
       // Create a new user
@@ -82,11 +82,11 @@ public abstract class GenericUserController {
   }
 
   @GetMapping("/viewData/{username}")
-  protected ResponseEntity<DataUserModel> viewData(@PathVariable String username){
+  protected ResponseEntity<?> viewData(@PathVariable String username){
     DataUserModel data = dataservice.dataUserGet(username);
 
     if (data==null) {
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist or maybe they are not a player");
     }
     return ResponseEntity.ok(data);
   }

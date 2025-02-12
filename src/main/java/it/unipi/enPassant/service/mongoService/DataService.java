@@ -18,10 +18,14 @@ public class DataService {
     public DataUserModel dataUserGet(String username) {
         DocumentUser user = userRepository.findByUsername(username);
         System.out.println(user);
+
+        if(!user.getType().equals("1")){
+            return null;
+        }
         return new DataUserModel(
                 user.getName(),
                 user.getSurname(),
-                user.getid(),
+                user.getId(),
                 user.getELO(),
                 user.getBirthDate()
         );
@@ -32,7 +36,7 @@ public class DataService {
         System.out.println(users.size());
         return userRepository.findAll()
                 .stream()
-                .map(user -> user.getid().toString()) // Convertiamo l'_id in stringa
+                .map(user -> user.getId().toString()) // Convertiamo l'_id in stringa
                 .collect(Collectors.toList());
     }
 

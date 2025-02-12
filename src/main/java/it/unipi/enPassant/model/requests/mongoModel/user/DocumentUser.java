@@ -1,36 +1,39 @@
 package it.unipi.enPassant.model.requests.mongoModel.user;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "user")
 public class DocumentUser {
 
     @Id
     private String id;
+    
     private String BirthDate;
     private String Name;
     private String Password;
     private String Surname;
     private String Type;
-    private int ELO;
+    private Integer ELO;
     private Boolean Status; // True if the player is disqualified
     private List<DocumentMatchUser> Matches;
 
 
-    private int NumberOfPlayedMatches;
-    private int NumberOfVictories;
-    private int NumberOfDefeats;
-    private int NumberOfDraws;
-    private double avgMovesNumber; // Unico campo che inizia con minuscola
+    private Integer NumberOfPlayedMatches;
+    private Integer NumberOfVictories;
+    private Integer NumberOfDefeats;
+    private Integer NumberOfDraws;
+    private Double avgMovesNumber; // Unico campo che inizia con minuscola
 
 
     public DocumentUser() {}
 
     public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
-                        String Type, int ELO, boolean Status, List<DocumentMatchUser> Matches,
-                        int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
-                        int NumberOfDraws, double avgMovesNumber) {
+                        String Type, Integer ELO, Boolean Status, List<DocumentMatchUser> Matches,
+                        Integer NumberOfPlayedMatches, Integer NumberOfVictories, Integer NumberOfDefeats,
+                        Integer NumberOfDraws, Double avgMovesNumber) {
         this.id = Id;
         this.BirthDate = BirthDate;
         this.Name = Name;
@@ -48,9 +51,9 @@ public class DocumentUser {
     }
 
     public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname,
-                        String Type, int ELO, List<DocumentMatchUser> Matches,
-                        int NumberOfPlayedMatches, int NumberOfVictories, int NumberOfDefeats,
-                        int NumberOfDraws, double avgMovesNumber) {
+                        String Type, Integer ELO, List<DocumentMatchUser> Matches,
+                        Integer NumberOfPlayedMatches, Integer NumberOfVictories, Integer NumberOfDefeats,
+                        Integer NumberOfDraws, Double avgMovesNumber) {
         this.id = Id;
         this.BirthDate = BirthDate;
         this.Name = Name;
@@ -67,25 +70,25 @@ public class DocumentUser {
         this.avgMovesNumber = avgMovesNumber;
     }
 
-    /*public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname, String Type) {
+    public DocumentUser(String Id, String BirthDate, String Name, String Password, String Surname, String Type) {
         this.id = Id;
         this.BirthDate = BirthDate;
         this.Name = Name;
         this.Password = Password;
         this.Surname = Surname;
         this.Type = Type;
-        this.Status = Boolean.FALSE;
-        this.ELO = 0;
+        this.Status = null;
+        this.ELO = null;
         this.Matches = null;
-        this.NumberOfPlayedMatches = 0;
-        this.NumberOfVictories = 0;
-        this.NumberOfDefeats = 0;
-        this.NumberOfDraws = 0;
-        this.avgMovesNumber = 0.0;
-    }*/
+        this.NumberOfPlayedMatches = null;
+        this.NumberOfVictories = null;
+        this.NumberOfDefeats = null;
+        this.NumberOfDraws = null;
+        this.avgMovesNumber = null;
+    }
 
     // Getter & Setter
-    public String getid() {
+    public String getId() {
         return id;
     }
 
@@ -133,19 +136,19 @@ public class DocumentUser {
         this.Type = Type;
     }
 
-    public int getELO() {
+    public Integer getELO() {
         return ELO;
     }
 
-    public void setELO(int ELO) {
+    public void setELO(Integer ELO) {
         this.ELO = ELO;
     }
 
-    public boolean isStatus() {
+    public Boolean isStatus() {
         return Status;
     }
 
-    public void setStatus(boolean Status) {
+    public void setStatus(Boolean Status) {
         this.Status = Status;
     }
 
@@ -157,43 +160,43 @@ public class DocumentUser {
         this.Matches = Matches;
     }
 
-    public int getNumberOfPlayedMatches() {
+    public Integer getNumberOfPlayedMatches() {
         return NumberOfPlayedMatches;
     }
 
-    public void setNumberOfPlayedMatches(int NumberOfPlayedMatches) {
+    public void setNumberOfPlayedMatches(Integer NumberOfPlayedMatches) {
         this.NumberOfPlayedMatches = NumberOfPlayedMatches;
     }
 
-    public int getNumberOfVictories() {
+    public Integer getNumberOfVictories() {
         return NumberOfVictories;
     }
 
-    public void setNumberOfVictories(int NumberOfVictories) {
+    public void setNumberOfVictories(Integer NumberOfVictories) {
         this.NumberOfVictories = NumberOfVictories;
     }
 
-    public int getNumberOfDefeats() {
+    public Integer getNumberOfDefeats() {
         return NumberOfDefeats;
     }
 
-    public void setNumberOfDefeats(int NumberOfDefeats) {
+    public void setNumberOfDefeats(Integer NumberOfDefeats) {
         this.NumberOfDefeats = NumberOfDefeats;
     }
 
-    public int getNumberOfDraws() {
+    public Integer getNumberOfDraws() {
         return NumberOfDraws;
     }
 
-    public void setNumberOfDraws(int NumberOfDraws) {
+    public void setNumberOfDraws(Integer NumberOfDraws) {
         this.NumberOfDraws = NumberOfDraws;
     }
 
-    public double getAvgMovesNumber() {
+    public Double getAvgMovesNumber() {
         return avgMovesNumber;
     }
 
-    public void setAvgMovesNumber(double avgMovesNumber) {
+    public void setAvgMovesNumber(Double avgMovesNumber) {
         this.avgMovesNumber = avgMovesNumber;
     }
 }
