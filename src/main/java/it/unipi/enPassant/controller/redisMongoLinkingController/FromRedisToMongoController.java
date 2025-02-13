@@ -4,10 +4,7 @@ import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournamen
 import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
 import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.repositories.TournamentRepository;
-import it.unipi.enPassant.service.redisService.ClusterFlush;
-import it.unipi.enPassant.service.redisService.LiveMatchService;
-import it.unipi.enPassant.service.redisService.ManagePlayerService;
-import it.unipi.enPassant.service.redisService.RequestService;
+import it.unipi.enPassant.service.redisService.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 import org.bson.Document;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -45,6 +43,9 @@ public class FromRedisToMongoController {
     private TournamentRepository repository;
 
     @Autowired
+    private RedisReplicationChecker redisReplicationChecker;
+
+    @Autowired
     private ClusterFlush clusterFlush;
 
     private List<String> blitzPlayers;
@@ -55,6 +56,11 @@ public class FromRedisToMongoController {
 
     @GetMapping
     public ResponseEntity<List<Request>> appUpdate() {
+        // 0. waiting for the synchronization of redis cluster
+        if (!redisReplicationChecker.waitForReplicationSync()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Collections.emptyList());
+        }
         // 1. Get disqualified players and update MongoDB player status
         Set<String> disqualified = managePlayerService.getAllDisqualifiedPlayers();
         for (Object user : disqualified) {
@@ -90,37 +96,48 @@ public class FromRedisToMongoController {
         // 3. Get live match and update
         updateTournamentsWithLiveMatches();
 
-        //4. Retrive pending request
+        //4. Retrieve pending request
         List<Request> pendingRequests = getAllPendingRequests();
 
-        // 5. Flush Key Value DB the information that contains now are  no more rilevant
+        // 5. Flush Key Value DB the information that contains now are  no more relevant
         clusterFlush.flushClusterDB();
 
         return ResponseEntity.ok(pendingRequests);
     }
 
-    // This function retrive from Key Value the list of the player that are enroll in some categories and divide them into three lists
+    // This function retrieve from Key Value the list of the player that are enroll in some categories and divide them into three lists
     private void categorizePlayers(Map<String, String> enrolled) {
         blitzPlayers = new ArrayList<>();
         openPlayers = new ArrayList<>();
         rapidPlayers = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : enrolled.entrySet()) {
-            String playerId = String.valueOf(entry.getKey());
-            String category = String.valueOf(entry.getValue());
+            String playerId = entry.getKey();
+            String category = entry.getValue().toLowerCase();
 
-            switch (category.toLowerCase()) {
+            // Query per verificare se il giocatore esiste ed è di tipo "player"
+            Query query = new Query(Criteria.where("_id").is(playerId).and("Type").is("1"));
+
+            if (!mongoTemplate.exists(query, "user")) {
+                System.out.println("Player ID " + playerId + " does not exist or is not of type 'player'. Skipping...");
+                continue; // Salta il giocatore se non esiste o non è un "player"
+            }
+
+            // Inserisci il giocatore nella categoria corretta
+            switch (category) {
                 case "blitz" -> blitzPlayers.add(playerId);
                 case "open" -> openPlayers.add(playerId);
                 case "rapid" -> rapidPlayers.add(playerId);
+                default -> System.out.println("Unknown category for player ID " + playerId + ": " + category);
             }
         }
     }
 
+
     // This is one of the main function called by the getMapping
     // the player that are enrolled are putted into the tournament document.
-    // In this way when the submission to the tournament are ended the manager can create the maindraw.
-    //this function use the ausiliar function tournamentExists, isRegistrationOpen createTournament and
+    // In this way when the submission to the tournament are ended the manager can create the main draw.
+    //this function use the auxiliary function tournamentExists, isRegistrationOpen createTournament and
     // addPlayersToTournament in order to keep the code as much modular as possible
     private void manageTournamentRegistration(String category, List<String> players) {
         int currentYear = LocalDate.now().getYear();
@@ -199,7 +216,7 @@ public class FromRedisToMongoController {
     // This is another core part of the getMapping. The aims are to insert the live match already ends in the DocumentDB
     // in this way they could be stored , we can flush the KeyValue DB without losing information.
     // Some System.out were add in order to improve the readability of the code in the execution phase.
-    //this function use the ausiliar function calculateDuration(), retrieveUserInformation() and updateUserInformation()
+    //this function use the auxiliary function calculateDuration(), retrieveUserInformation() and updateUserInformation()
     // in order to keep the code as much modular as possible
     private void updateTournamentsWithLiveMatches() {
         System.out.println("Retrieving Live Matches from Redis");
@@ -277,12 +294,12 @@ public class FromRedisToMongoController {
         }
     }
 
-    private double calculateDuration(String start, String end) { //* modificato per restituire un double
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss"); //* aggiunto per formattare l'orario
+    private double calculateDuration(String start, String end) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         LocalTime startTime = LocalTime.parse(start, formatter);
         LocalTime endTime = LocalTime.parse(end, formatter);
 
-        return java.time.Duration.between(startTime, endTime).toMinutes(); //* calcola la durata in minuti come double
+        return java.time.Duration.between(startTime, endTime).toMinutes();
     }
 
     private String computeResult(String white, String black, String winner) {
@@ -291,11 +308,11 @@ public class FromRedisToMongoController {
         else return "0.5-0.5";
     }
 
-    // This is the last core function here we garantee data integrity updating the user document everytime we insert
+    // This is the last core function here we guarantee data integrity updating the user document everytime we insert
     // a tournament match. This is made by two steps first we create the embedded document and in a second instance
-    // we update all the statistical fields. This function use the ausiliar function updateUserMatchRecord() in order
+    // we update all the statistical fields. This function use the auxiliary function updateUserMatchRecord() in order
     // to keep the code as much modular as possible.
-    // (There are some print that are usefull to view the various execution status of the function)
+    // (There are some print that are usefully to view the various execution status of the function)
     private void updateUserInformation(DocumentMatch match) {
         String whitePlayerId = match.getWhite();
         String blackPlayerId = match.getBlack();
