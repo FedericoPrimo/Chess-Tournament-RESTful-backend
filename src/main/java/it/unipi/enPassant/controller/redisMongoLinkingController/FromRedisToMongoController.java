@@ -124,27 +124,48 @@ public class FromRedisToMongoController {
     // addPlayersToTournament in order to keep the code as much modular as possible
     private void manageTournamentRegistration(String category, List<String> players) {
         int currentYear = LocalDate.now().getYear();
-        // check the existence of the tournaments
+        System.out.println("Managing tournament registration for year: " + currentYear + ", category: " + category);
+        System.out.println("Players to register: " + players);
+
+        // Check the existence of the tournament for the current year
         if (!tournamentExists(currentYear, category)) {
+            System.out.println("Tournament for " + currentYear + " in category " + category + " does not exist. Creating...");
             createTournament(currentYear, category);
             addPlayersToTournament(currentYear, category, players);
+            System.out.println("Players added to new tournament.");
             return;
-        }
-        // check the entry closing date
-        if (isRegistrationOpen(currentYear, category)) {
-            addPlayersToTournament(currentYear, category, players);
-            return;
+        } else {
+            System.out.println("Tournament for " + currentYear + " in category " + category + " already exists.");
         }
 
-        // if submission were closed the submission is good for the next year
-        int nextYear = currentYear + 1;
-        if (!tournamentExists(nextYear, category)) {
-            createTournament(nextYear, category);
+        // Check if registration is still open
+        if (isRegistrationOpen(currentYear, category)) {
+            System.out.println("Registration is open for " + currentYear + ". Adding players...");
+            addPlayersToTournament(currentYear, category, players);
+            return;
+        } else {
+            System.out.println("Registration is closed for " + currentYear + ".");
         }
+
+        // If submission is closed, try for next year
+        int nextYear = currentYear + 1;
+        System.out.println("Checking for next year: " + nextYear);
+
+        if (!tournamentExists(nextYear, category)) {
+            System.out.println("Tournament for " + nextYear + " in category " + category + " does not exist. Creating...");
+            createTournament(nextYear, category);
+        } else {
+            System.out.println("Tournament for " + nextYear + " in category " + category + " already exists.");
+        }
+
         if (isRegistrationOpen(nextYear, category)) {
+            System.out.println("Registration is open for " + nextYear + ". Adding players...");
             addPlayersToTournament(nextYear, category, players);
+        } else {
+            System.out.println("Registration is closed for " + nextYear + ".");
         }
     }
+
 
     private boolean tournamentExists(int year, String category) {
         Query query = new Query(Criteria.where("Edition").is(year).and("Category").is(category));
