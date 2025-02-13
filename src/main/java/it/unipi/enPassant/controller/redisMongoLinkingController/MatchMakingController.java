@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/tournament/matchMacking")
-public class MatchMackingController {
+@RequestMapping("api/tournament/matchMaking")
+public class MatchMakingController {
 
     private final MongoTemplate mongoTemplate;
     private final LiveMatchService tournamentService;
 
-    public MatchMackingController(MongoTemplate mongoTemplate, LiveMatchService tournamentService) {
+    public MatchMakingController(MongoTemplate mongoTemplate, LiveMatchService tournamentService) {
         this.mongoTemplate = mongoTemplate;
         this.tournamentService = tournamentService;
     }

@@ -1,8 +1,10 @@
 import requests
 import time
+from login import spectatorLogin
 
-URL = "http://localhost:8080/api/LiveMatch/retrieveMoveList/segreto_mattia-bro_bro"  # Sostituisci con l'URL corretto
-RESULT_URL = "http://localhost:8080/api/LiveMatch/matchDetails/segreto_mattia-bro_bro"
+USER = "green_robert"
+URL = "http://localhost:8080/api/LiveMatch/retrieveMoveList/segreto_mattia-calzolari_federico"  # Sostituisci con l'URL corretto
+RESULT_URL = "http://localhost:8080/api/LiveMatch/matchDetails/segreto_mattia-calzolari_federico"
 INTERVAL = 2  # Secondi tra le richieste
 MAX_NO_CHANGE_COUNT = 5  # Numero massimo di tentativi senza cambiamenti
 END_DELAY = 5 
@@ -10,10 +12,15 @@ END_DELAY = 5
 def spettatore():
     last_response = None  # Memorizza l'ultima risposta ricevuta
     no_change_count = 0  # Conta i tentativi senza cambiamenti
+    token = spectatorLogin(USER)
 
     while True:
         try:
-            response = requests.get(URL)
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}"
+            }
+            response = requests.get(URL, headers=headers)
             
             if response.status_code == 200:
                 try:

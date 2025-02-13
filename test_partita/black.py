@@ -1,7 +1,8 @@
 import requests
 import time
-
-URL = "http://localhost:8080/api/LiveMatch/insertMoves/bro_bro/segreto_mattia-bro_bro"  # Sostituisci con l'URL effettivo
+from login import playerLogin
+USER = "calzolari_federico"
+URL = "http://localhost:8080/api/LiveMatch/insertMoves/calzolari_federico/segreto_mattia-calzolari_federico"  # Sostituisci con l'URL effettivo
 INTERVAL = 3  # Secondi tra una mossa e l'altra
 
 # Lista di mosse (simulazione di una partita)
@@ -12,7 +13,11 @@ BLACK_MOVES = [
 ]
 
 def black():
-    headers = {"Content-Type": "text/plain"}  # Indichiamo che stiamo inviando testo puro
+    token = playerLogin(USER)
+    headers = {
+        "Content-Type": "text/plain",
+        "Authorization": f"Bearer {token}"
+      }
     for move in BLACK_MOVES:
         try:
             response = requests.post(URL, data=move, headers=headers)  # Invio solo la stringa della mossa
