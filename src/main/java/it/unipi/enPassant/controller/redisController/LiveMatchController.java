@@ -1,8 +1,11 @@
 package it.unipi.enPassant.controller.redisController;
 
+import it.unipi.enPassant.config.JwtFilter;
+import it.unipi.enPassant.service.JWTService;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
 import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/LiveMatch")
 public class LiveMatchController {
+
+    @Autowired
+    JWTService jwtService;
 
     @Autowired
     private LiveMatchService liveMatchService;
@@ -36,6 +42,7 @@ public class LiveMatchController {
             @RequestBody String move,
             @PathVariable String userId,
             @PathVariable String matchId) {
+
 
         boolean success = liveMatchService.addMoves(move, userId, matchId);
         if (success) {

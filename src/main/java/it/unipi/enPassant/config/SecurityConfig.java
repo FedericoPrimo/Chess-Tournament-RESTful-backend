@@ -79,7 +79,7 @@ public class SecurityConfig {
                     // Manager endpoints require manager role ("0")
                       .requestMatchers("/api/manager/**").hasAuthority("0")
                       .requestMatchers("/api/managePlayer/disqualified/{playerId}").hasAuthority("0")
-                      .requestMatchers("/api/tournament/matchMacking/**").hasAuthority("0")
+                      .requestMatchers("/api/tournament/matchMaking/**").hasAuthority("0")
                       .requestMatchers("/api/requests/next").hasAuthority("0")
                       .requestMatchers("/api/requests/reset").hasAuthority("0")
                       .requestMatchers("/api/requests/size").hasAuthority("0")

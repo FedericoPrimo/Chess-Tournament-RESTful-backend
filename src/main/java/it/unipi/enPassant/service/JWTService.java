@@ -23,7 +23,7 @@ public class JWTService {
   private static String secretKey = "";
 
   public JWTService() {
-    try{
+    try {
       KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
       SecretKey sk = keyGen.generateKey();
       secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
@@ -47,7 +47,7 @@ public class JWTService {
             .compact();
   }
 
-  private static SecretKey getKey(){
+  private static SecretKey getKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
   }
@@ -60,9 +60,11 @@ public class JWTService {
       return false; // Invalid token
     }
   }
-  public static  String extractUsername(String token) {
+
+  public static String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
   }
+
   private static <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
     final Claims claims = extractAllClaims(token);
     return claimResolver.apply(claims);
@@ -76,6 +78,7 @@ public class JWTService {
             .getPayload();
   }
 
+
   private static boolean isTokenExpired(String token) {
     return extractExpiration(token).before(new Date());
   }
@@ -83,4 +86,5 @@ public class JWTService {
   private static Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
   }
+
 }

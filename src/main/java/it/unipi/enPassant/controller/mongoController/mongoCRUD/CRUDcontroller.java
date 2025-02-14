@@ -1,4 +1,8 @@
 package it.unipi.enPassant.controller.mongoController.mongoCRUD;
+import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +19,11 @@ public abstract class CRUDcontroller<T, ID> {
         this.repository = repository;
     }
 
-    @GetMapping("/read")
-    public List<T> getAll() {
-        return repository.findAll();
+    @GetMapping("/read/{pageNo}/{pageSize}")
+    public List<T> getAll(@PathVariable int pageNo, @PathVariable int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<T> page = repository.findAll(pageable);
+        return page.getContent();
     }
 
     @PostMapping("/create")
