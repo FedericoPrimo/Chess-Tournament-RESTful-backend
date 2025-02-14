@@ -20,7 +20,7 @@ public class DataUserModel {
         private String username;
 
         @JsonProperty("elo")
-        private int elo;
+        private Integer elo;
 
         @JsonProperty("birthdate")
         private String birthdate;
@@ -33,6 +33,14 @@ public class DataUserModel {
             this.surname = surname;
             this.username = username;
             this.elo = elo;
+            this.birthdate = birthdate;
+        }
+
+        public DataUserModel(String name, String surname, String username, String birthdate) {
+            this.name = name;
+            this.surname = surname;
+            this.username = username;
+            this.elo = null;
             this.birthdate = birthdate;
         }
 }

@@ -34,12 +34,12 @@ public class MatchMakingController {
         Document tournamentDoc = mongoTemplate.findOne(query, Document.class, "tournaments");
 
         if (tournamentDoc == null || !tournamentDoc.containsKey("Participants")) {
-            return ResponseEntity.badRequest().body("Torneo non trovato o partecipanti non disponibili.");
+            return ResponseEntity.badRequest().body("Tournament not found or participants list not available");
         }
 
         List<String> participants = (List<String>) tournamentDoc.get("Participants");
         if (participants.size() < 2) {
-            return ResponseEntity.badRequest().body("Partecipanti insufficienti per generare il tabellone.");
+            return ResponseEntity.badRequest().body("There must be at least 2 participants in order to generate a main draw");
         }
 
         List<String> matchIds = new ArrayList<>();
@@ -65,7 +65,7 @@ public class MatchMakingController {
 
         mongoTemplate.updateFirst(query, update, "tournaments");
 
-        return ResponseEntity.ok("Tabellone creato con successo.");
+        return ResponseEntity.ok("Main draw created successfully");
     }
 
 
@@ -77,17 +77,17 @@ public class MatchMakingController {
         Document tournamentDoc = mongoTemplate.findOne(query, Document.class, "tournaments");
 
         if (tournamentDoc == null || !tournamentDoc.containsKey("MatchDays")) {
-            return ResponseEntity.badRequest().body("Nessuna giornata disponibile da schedulare.");
+            return ResponseEntity.badRequest().body("No matchdays available");
         }
 
         List<List<String>> matchDays = (List<List<String>>) tournamentDoc.get("MatchDays");
         if (matchDays.isEmpty()) {
-            return ResponseEntity.badRequest().body("Nessuna giornata rimanente.");
+            return ResponseEntity.badRequest().body("No matchdays left to be scheduled");
         }
 
         List<String> nextDayMatches = matchDays.get(0);
         if (nextDayMatches.isEmpty()) {
-            return ResponseEntity.badRequest().body("La giornata selezionata è vuota.");
+            return ResponseEntity.badRequest().body("The selected matchday is empty");
         }
 
 
@@ -105,6 +105,6 @@ public class MatchMakingController {
         Update update = new Update().set("MatchDays", matchDays);
         mongoTemplate.updateFirst(query, update, "tournaments");
 
-        return ResponseEntity.ok("Giornata caricata con successo nel Redis.");
+        return ResponseEntity.ok("Matchday sucessfully scheduled");
     }
 }

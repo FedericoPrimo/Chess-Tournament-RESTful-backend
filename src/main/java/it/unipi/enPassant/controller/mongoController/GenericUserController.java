@@ -84,7 +84,7 @@ public abstract class GenericUserController {
     DataUserModel data = dataservice.dataUserGet(username);
 
     if (data==null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist or maybe they are not a player");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
     return ResponseEntity.ok(data);
   }

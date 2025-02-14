@@ -24,7 +24,12 @@ public class DataService {
         System.out.println(user);
 
         if(!user.getType().equals("1")){
-            return null;
+            return new DataUserModel(
+                    user.getName(),
+                    user.getSurname(),
+                    user.getId(),
+                    user.getBirthDate()
+            );
         }
         return new DataUserModel(
                 user.getName(),

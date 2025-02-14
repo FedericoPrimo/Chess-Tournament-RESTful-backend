@@ -299,6 +299,10 @@ public class FromRedisToMongoController {
 
     private double calculateDuration(String start, String end) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        if(start.length() == 5)
+            start = start.concat(":00");
+        if(end.length() == 5)
+            end = end.concat(":00");
         LocalTime startTime = LocalTime.parse(start, formatter);
         LocalTime endTime = LocalTime.parse(end, formatter);
 
