@@ -1,7 +1,9 @@
 package it.unipi.enPassant.controller.redisController;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Response;
 
 import java.util.Map;
 import java.util.Set;
@@ -47,9 +49,12 @@ public class ManagePlayerController {
     }
 
     @DeleteMapping("/register/{playerId}")
-    public String removeRegisteredPlayer(@PathVariable String playerId) {
-        managePlayerService.removeRegisteredPlayer(playerId);
-        return "Player " + playerId + " removed from registered list.";
+    public ResponseEntity<String> removeRegisteredPlayer(@PathVariable String playerId) {
+        boolean status = managePlayerService.removeRegisteredPlayer(playerId);
+        if(status)
+            return ResponseEntity.ok("Player " + playerId + " removed from registered list.");
+        else
+            return ResponseEntity.badRequest().body("Player " + playerId + " is not registered.");
     }
 
     @GetMapping("/register/{playerId}")

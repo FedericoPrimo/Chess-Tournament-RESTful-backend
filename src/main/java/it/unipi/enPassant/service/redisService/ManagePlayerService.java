@@ -54,8 +54,12 @@ public class ManagePlayerService {
         jedisCluster.hset(REGISTERED_PLAYERS_KEY, playerId, category);
     }
 
-    public void removeRegisteredPlayer(String playerId) {
+    public boolean removeRegisteredPlayer(String playerId) {
+        boolean status = jedisCluster.hexists(REGISTERED_PLAYERS_KEY, playerId);
+        if(!status)
+            return false;
         jedisCluster.hdel(REGISTERED_PLAYERS_KEY, playerId);
+        return true;
     }
 
     public boolean isPlayerRegistered(String playerId) {

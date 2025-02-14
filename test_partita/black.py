@@ -19,13 +19,16 @@ def black():
         "Authorization": f"Bearer {token}"
       }
     for move in BLACK_MOVES:
+        start_time = time.time()
         try:
-            response = requests.post(URL, data=move, headers=headers)  # Invio solo la stringa della mossa
-            print(f"Black - Move: {move} | Status: {response.status_code}, Response: {response.text}")
+            response = requests.post(URL, data=move, headers=headers)
+            print(f"White - Move: {move} | Status: {response.status_code}, Response: {response.text}")
         except Exception as e:
             print(f"Errore: {e}")
-
-        time.sleep(INTERVAL)  # Attendere prima della prossima mossa
+        elapsed = time.time() - start_time
+        sleep_time = INTERVAL - elapsed
+        if sleep_time > 0:
+            time.sleep(sleep_time)  # Attendere il tempo residuo prima della prossima mossa
 
     print("Black ha terminato tutte le mosse.")
 

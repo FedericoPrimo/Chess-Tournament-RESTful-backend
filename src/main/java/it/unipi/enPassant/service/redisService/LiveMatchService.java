@@ -61,10 +61,21 @@ public class LiveMatchService {
         }
     }
 
-    public void removeLiveMatch(String matchId) {
-        jedisCluster.del("Live:" + matchId);
+    public boolean removeLiveMatch(String matchId) {
+        String matchJson = readWithConsistency("Live:" + matchId);
+        if(matchJson == null) {
+            return false;
+        }
+
+        for (int i = 0; i < REPLICATION_FACTOR; i++) {
+            jedisCluster.del("Live:" + matchId + ":replica" + i);
+            jedisCluster.del("Live:" + matchId + ":progressive");
+            jedisCluster.del("Live:" + matchId + ":moveList");
+        }
         jedisCluster.srem(LIVE_MATCHES_KEY, matchId);
+        return true;
     }
+
 
     public Boolean addMoves(String moves, String user, String matchId) {
         String progressiveKey = "Live:" + matchId + ":progressive";

@@ -60,8 +60,11 @@ public class LiveMatchController {
 
     @DeleteMapping("/removeLiveMatch/{matchId}")
     public ResponseEntity<String> removeLiveMatch(@PathVariable String matchId) {
-        liveMatchService.removeLiveMatch(matchId);
-        return ResponseEntity.ok("Match " + matchId + " removed successfully.");
+        boolean status = liveMatchService.removeLiveMatch(matchId);
+        if(status)
+            return ResponseEntity.ok("Match " + matchId + " removed successfully.");
+        else
+            return ResponseEntity.badRequest().body("Match " + matchId + " not found.");
     }
 
     @PostMapping("/addLiveMatches")
