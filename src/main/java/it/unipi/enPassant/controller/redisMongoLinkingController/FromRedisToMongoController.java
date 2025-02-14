@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
@@ -54,7 +54,7 @@ public class FromRedisToMongoController {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @GetMapping
+    @PutMapping
     public ResponseEntity<List<Request>> appUpdate() {
         // 0. waiting for the synchronization of redis cluster
         if (!redisReplicationChecker.waitForReplicationSync()) {
@@ -115,15 +115,18 @@ public class FromRedisToMongoController {
             String playerId = entry.getKey();
             String category = entry.getValue().toLowerCase();
 
-            // Query per verificare se il giocatore esiste ed è di tipo "player"
-            Query query = new Query(Criteria.where("_id").is(playerId).and("Type").is("1"));
+
+            Query query = new Query(Criteria.where("_id").is(playerId)
+                    .and("Type").is("1")
+                    .orOperator(Criteria.where("status").exists(false),
+                            Criteria.where("status").ne(1)));
 
             if (!mongoTemplate.exists(query, "user")) {
                 System.out.println("Player ID " + playerId + " does not exist or is not of type 'player'. Skipping...");
-                continue; // Salta il giocatore se non esiste o non è un "player"
+                continue;
             }
 
-            // Inserisci il giocatore nella categoria corretta
+
             switch (category) {
                 case "blitz" -> blitzPlayers.add(playerId);
                 case "open" -> openPlayers.add(playerId);
