@@ -4,6 +4,10 @@ import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.model.requests.mongoModel.user.StatsModel;
 import it.unipi.enPassant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +35,13 @@ public class DataService {
         );
     }
 
-    public List<String> getAllUserIds() {
-        List<DocumentUser> users = userRepository.findAll();
-        System.out.println(users.size());
-        return userRepository.findAll()
+    public List<String> getAllUserIds(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<DocumentUser> page = userRepository.findAll(pageable);
+        List<DocumentUser> list = page.getContent();
+        System.out.println(list.size());
+
+        return list
                 .stream()
                 .map(user -> user.getId().toString()) // Convertiamo l'_id in stringa
                 .collect(Collectors.toList());

@@ -2,6 +2,8 @@ package it.unipi.enPassant.repositories;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DataTournamentMatchModel;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.UserMatchUpdateModel;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -14,7 +16,8 @@ import java.util.Optional;
 @Repository
 public interface TournamentRepository extends MongoRepository<DocumentTournament, String>{
 
-    List<DocumentTournament> findAll();
+    //List<DocumentTournament> findAll();
+    Page<DocumentTournament> findAll(Pageable pageable);
 
     @Aggregation(pipeline = {
             "{ $match: { 'Edition': ?0, 'Category': ?1, 'Location': ?2 } }",

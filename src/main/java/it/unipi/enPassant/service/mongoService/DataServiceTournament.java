@@ -2,8 +2,12 @@ package it.unipi.enPassant.service.mongoService;
 
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.*;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.repositories.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
@@ -19,10 +23,12 @@ public class DataServiceTournament {
     @Autowired
     private TournamentRepository tournamentRepository;
 
-    public List<TournamentModel> tournamentGetList() {
-        List<DocumentTournament> lista = tournamentRepository.findAll();
+    public List<TournamentModel> tournamentGetList(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<DocumentTournament> page = tournamentRepository.findAll(pageable);
+        List<DocumentTournament> list = page.getContent();
 
-        return lista.stream()
+        return list.stream()
                 .map(doc -> new TournamentModel( doc.getEdition(), doc.getCategory(), doc.getLocation()))
                 .collect(Collectors.toList());
     }

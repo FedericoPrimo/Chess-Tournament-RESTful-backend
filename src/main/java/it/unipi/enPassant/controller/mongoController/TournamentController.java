@@ -25,9 +25,10 @@ public class TournamentController{
 
     /* this GET allows us to retrive the list of all tournaments.
     It returns a list of jason with edition,category and location*/
-    @GetMapping("/tournamentList")
-    public ResponseEntity<List<TournamentModel>> tournamentList() {
-        List<TournamentModel> tournament = dataService.tournamentGetList();
+    @GetMapping("/tournamentList/{pageNo}/{pageSize}")
+    public ResponseEntity<List<TournamentModel>> tournamentList(@PathVariable int pageNo,
+                                                                @PathVariable int pageSize){
+        List<TournamentModel> tournament = dataService.tournamentGetList(pageNo, pageSize);
 
         if (tournament.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

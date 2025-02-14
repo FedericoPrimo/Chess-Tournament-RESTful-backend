@@ -9,16 +9,14 @@ import it.unipi.enPassant.service.AuthenticationService;
 import it.unipi.enPassant.service.mongoService.DataService;
 import it.unipi.enPassant.service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -91,9 +89,10 @@ public abstract class GenericUserController {
     return ResponseEntity.ok(data);
   }
 
-  @GetMapping("/viewUser")
-  protected ResponseEntity<List<String>> getAllUserIds(){
-    List<String> data = dataservice.getAllUserIds();
+  @GetMapping("/viewUser/{pageNo}/{pageSize}")
+  protected ResponseEntity<List<String>> getAllUserIds(@PathVariable int pageNo,
+                                                      @PathVariable int pageSize){
+    List<String> data = dataservice.getAllUserIds(pageNo, pageSize);
 
     if (data==null) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
