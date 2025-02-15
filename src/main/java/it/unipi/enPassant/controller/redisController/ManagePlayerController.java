@@ -4,9 +4,13 @@ import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Response;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +18,7 @@ import java.util.Set;
 @RequestMapping("api/managePlayer")
 @Tag(name = "Manage Player", description = "Manage Player operations")
 public class ManagePlayerController {
+    List<String> validOutcomes = Arrays.asList("Blitz", "Rapid", "Open");
 
     @Autowired
     private ManagePlayerService managePlayerService;
@@ -53,6 +58,14 @@ public class ManagePlayerController {
     /*ENROLL CATEGORY SECTION*/
     @PostMapping("/register/{playerId}/{category}")
     public ResponseEntity<String> registerPlayer(@PathVariable String playerId, @PathVariable String category) {
+        Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loggedUser = ((UserDetails) obj).getUsername();
+        if(!loggedUser.equals(playerId)){
+            return ResponseEntity.badRequest().body("You can only enroll yourself!");
+        }
+        if(!validOutcomes.contains(category))
+            return ResponseEntity.badRequest().body("Category must be one of: Blitz, Rapid, Open");
+
         boolean status = managePlayerService.registerPlayer(playerId, category);
         if(!status)
             return ResponseEntity.badRequest().body("Player " + playerId + " disqualified or already registered in category " + category + ".");

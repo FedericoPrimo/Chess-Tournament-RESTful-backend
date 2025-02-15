@@ -25,6 +25,10 @@ public class LiveMatchService {
     }
 
     public boolean addLiveMatch(String matchId, String category, String startingTime) {
+        String check = readRedis(LIVE_MATCHES_KEY + matchId);
+        if(check != null) {
+            return false;
+        }
         try {
             LiveMatch liveMatch = new LiveMatch(category, startingTime);
             String matchJson = objectMapper.writeValueAsString(liveMatch);
@@ -74,16 +78,16 @@ public class LiveMatchService {
         if(matchJson == null) {
             return false;
         }
-
-
         jedisCluster.del(LIVE_MATCHES_KEY + matchId);
         jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":progressive");
         jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":moveList");
+        jedisCluster.srem(LIVE_MATCHES_KEY, matchId);
         return true;
     }
 
 
     public Boolean addMoves(String moves, String user, String matchId) {
+
         String progressiveKey = LIVE_MATCHES_KEY + matchId + ":progressive";
         String moveListKey = LIVE_MATCHES_KEY + matchId + ":moveList";
         initializeProgressiveMoveKey(matchId);

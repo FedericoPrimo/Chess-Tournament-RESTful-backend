@@ -9,13 +9,14 @@ import it.unipi.enPassant.service.AuthenticationService;
 import it.unipi.enPassant.service.mongoService.DataService;
 import it.unipi.enPassant.service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,15 +65,14 @@ public abstract class GenericUserController {
   }
 
   @PostMapping("/register")
-  protected ResponseEntity<String> register(@RequestBody DocumentUser userModel) {
+  protected ResponseEntity<?> register(@RequestBody DocumentUser userModel) {
     try {
       // Check if the user already exists
       if (authservice.userExists(userModel.getId())) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
       }
       // Create a new user
-      crudControllerUser.create(userModel);
-      return ResponseEntity.ok("User created");
+      return crudControllerUser.create(userModel);
     }
     catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

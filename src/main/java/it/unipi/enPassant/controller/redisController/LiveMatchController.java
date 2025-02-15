@@ -2,12 +2,15 @@ package it.unipi.enPassant.controller.redisController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.config.JwtFilter;
+import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.service.JWTService;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
 import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +34,7 @@ public class LiveMatchController {
             @PathVariable String startingTime) {
         boolean status = liveMatchService.addLiveMatch(matchId, category, startingTime);
         if(!status)
-            return ResponseEntity.badRequest().body("Match " + matchId + " not submitted successfully.");
+            return ResponseEntity.badRequest().body("Match " + matchId + " already exists.");
         else
             return ResponseEntity.ok("Match submitted successfully.");
     }
@@ -47,7 +50,12 @@ public class LiveMatchController {
             @RequestBody String move,
             @PathVariable String userId,
             @PathVariable String matchId) {
+        Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loggedUser = ((UserDetails) obj).getUsername();
 
+        if(!loggedUser.equals(userId)) {
+            return ResponseEntity.badRequest().body("You can only insert your own moves");
+        }
 
         boolean success = liveMatchService.addMoves(move, userId, matchId);
         if (success) {
@@ -62,7 +70,7 @@ public class LiveMatchController {
     public ResponseEntity<?> retrieveMoveList(@PathVariable String matchId) {
         List<String> moves = liveMatchService.retrieveMovesList(matchId);
         if(moves.isEmpty())
-            return ResponseEntity.ok("No moves found for match " + matchId + ".\n" +
+            return ResponseEntity.badRequest().body("No moves found for match " + matchId + ".\n" +
                     "Check if the match id is correct. Or maybe the match has not started yet.");
         else{
             return ResponseEntity.ok(moves);

@@ -65,6 +65,9 @@ public class SecurityConfig {
                       .requestMatchers("/api/player/login").permitAll()
                       .requestMatchers("/api/manager/login").permitAll()
                       .requestMatchers("/api/spectator/login").permitAll()
+                      .requestMatchers("/api/player/register").permitAll()
+                      .requestMatchers("/api/manager/register").permitAll()
+                      .requestMatchers("/api/spectator/register").permitAll()
                       .requestMatchers("/api-docs.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     // All other endpoints require authentication
                       .requestMatchers("/api/tournaments-analytics").authenticated()
