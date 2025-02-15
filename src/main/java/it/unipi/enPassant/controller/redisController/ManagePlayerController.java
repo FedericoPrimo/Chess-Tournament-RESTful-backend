@@ -22,7 +22,7 @@ public class ManagePlayerController {
         return "Player " + playerId + " added to disqualified list.";
     }
 
-    @DeleteMapping("/disqualified/{playerId}")
+    @DeleteMapping("/disqualify/{playerId}")
     public String removeDisqualifiedPlayer(@PathVariable String playerId) {
         managePlayerService.removeDisqualifiedPlayer(playerId);
         return "Player " + playerId + " removed from disqualified list.";

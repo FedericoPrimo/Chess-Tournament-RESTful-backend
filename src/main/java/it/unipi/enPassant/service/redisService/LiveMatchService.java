@@ -126,7 +126,7 @@ public class LiveMatchService {
 
     private void writeWithConsistency(String key, String value) {
         jedisCluster.set(key, value);
-        long replicasAck = jedisCluster.waitReplicas(key, REPLICATION_FACTOR, 1000);
+        long replicasAck = jedisCluster.waitReplicas(key, REPLICATION_FACTOR, 10000);
         if (replicasAck < REPLICATION_FACTOR) {
             throw new RuntimeException("Write not replicated on at least " + REPLICATION_FACTOR + " replicas");
         }
