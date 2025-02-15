@@ -1,4 +1,5 @@
 package it.unipi.enPassant.controller.mongoController.mongoCRUD;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.repositories.CRUDrepositoryUser;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/userCRUD")
+@Tag(name = "User CRUD", description = "CRUD operations for User documents")
 public class CRUDcontrollerUser extends CRUDcontroller<DocumentUser, String> {
     private final PasswordEncoder passwordEncoder;
 

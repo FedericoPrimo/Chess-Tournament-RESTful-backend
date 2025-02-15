@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller.mongoController.mongoAnalytics;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.user.UserAnalyticsModel;
 import it.unipi.enPassant.service.mongoService.UserAnalyticsService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/user-analytics")
+@Tag(name = "User Analytics", description = "User Analytics operations")
 public class UserAnalyticsController {
     private final UserAnalyticsService userAnalyticsService;
     List<String> validOutcomes = Arrays.asList("win", "draw", "loss");

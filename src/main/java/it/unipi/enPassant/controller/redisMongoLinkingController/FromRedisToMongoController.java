@@ -1,4 +1,5 @@
 package it.unipi.enPassant.controller.redisMongoLinkingController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.model.requests.redisModel.LiveMatch;
@@ -24,6 +25,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("api/appUpdate")
+@Tag(name = "Mongo and Redis controller", description = "Operation to update MongoDB from Redis")
 public class FromRedisToMongoController {
 
     // 1.initialize the class

@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller.redisController;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.service.redisService.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/requests")
+@Tag(name = "Review Request", description = "Review Request operations")
 public class RequestController {
 
     @Autowired

@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller.mongoController.mongoAnalytics;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentsAnalyticsModel;
 import it.unipi.enPassant.service.mongoService.TournamentsAnalyticsService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/tournaments-analytics")
+@Tag(name = "Tournaments Analytics", description = "Tournaments Analytics operations")
 public class TournamentsAnalyticsController {
     private final TournamentsAnalyticsService tournamentsAnalyticsService;
     List<String> validOutcomes = Arrays.asList("Blitz", "Rapid", "Open");

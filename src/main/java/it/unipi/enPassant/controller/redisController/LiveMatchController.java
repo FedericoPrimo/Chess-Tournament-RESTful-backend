@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller.redisController;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.config.JwtFilter;
 import it.unipi.enPassant.service.JWTService;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/LiveMatch")
+@Tag(name = "Live Match", description = "Live Match operations")
 public class LiveMatchController {
 
     @Autowired

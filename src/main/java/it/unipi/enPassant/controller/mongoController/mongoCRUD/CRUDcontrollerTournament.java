@@ -1,6 +1,7 @@
 package it.unipi.enPassant.controller.mongoController.mongoCRUD;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentMatch;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DocumentTournament;
 import it.unipi.enPassant.repositories.CRUDrepositoryTournament;
@@ -14,6 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("api/tournamentsCRUD")
+@Tag(name = "Tournament CRUD", description = "CRUD operations for Tournament documents")
 public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament, String> {
 
     @Autowired

@@ -1,4 +1,5 @@
 package it.unipi.enPassant.controller.mongoController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.DataTournamentMatchModel;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.MatchListModel;
 import it.unipi.enPassant.model.requests.mongoModel.tournament.TournamentModel;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/tournament")
+@Tag(name = "Tournament", description = "Tournament operations")
 public class TournamentController{
     // Services used for interacting with the databases
     private final DataServiceTournament dataService;

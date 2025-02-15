@@ -1,4 +1,5 @@
 package it.unipi.enPassant.controller.redisController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("api/managePlayer")
+@Tag(name = "Manage Player", description = "Manage Player operations")
 public class ManagePlayerController {
 
     @Autowired

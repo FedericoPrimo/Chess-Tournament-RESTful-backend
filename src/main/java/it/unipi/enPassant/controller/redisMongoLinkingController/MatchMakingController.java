@@ -1,4 +1,5 @@
 package it.unipi.enPassant.controller.redisMongoLinkingController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/tournament/matchMaking")
+@Tag(name = "Match Making", description = "Match Making operations")
 public class MatchMakingController {
 
     private final MongoTemplate mongoTemplate;
