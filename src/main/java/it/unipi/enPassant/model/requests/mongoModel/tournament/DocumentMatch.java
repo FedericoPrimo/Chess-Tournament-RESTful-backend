@@ -13,7 +13,7 @@ import java.util.List;
 public class DocumentMatch {
     private int Date;
     private String White;
-    private String Eco;
+    private String ECO;
     private String Black;
     private String Result;
     private String Category;
@@ -26,11 +26,11 @@ public class DocumentMatch {
     public DocumentMatch() {}
 
     // Costruttore completo
-    public DocumentMatch(int Date, String White, String Eco, String Black,
+    public DocumentMatch(int Date, String White, String ECO, String Black,
                          String Result, String Category, List<String> Moves, String Winner, String Timestamp, double Duration) {
         this.Date = Date;
         this.White = White;
-        this.Eco = Eco;
+        this.ECO = ECO;
         this.Black = Black;
         this.Result = Result;
         this.Category = Category;
@@ -58,11 +58,11 @@ public class DocumentMatch {
     }
 
     public String getEco() {
-        return Eco;
+        return ECO;
     }
 
     public void setEco(String Eco) {
-        this.Eco = Eco;
+        this.ECO = Eco;
     }
 
     public String getBlack() {
