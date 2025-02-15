@@ -64,6 +64,7 @@ public class SecurityConfig {
                       .requestMatchers("/api/player/login").permitAll()
                       .requestMatchers("/api/manager/login").permitAll()
                       .requestMatchers("/api/spectator/login").permitAll()
+                      .requestMatchers("/api-docs.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     // All other endpoints require authentication
                       .requestMatchers("/api/tournaments-analytics").authenticated()
                       .requestMatchers("/api/user-analytics").authenticated()
@@ -100,7 +101,7 @@ public class SecurityConfig {
                     // Spectator endpoints require spectator role ("2")
                       .requestMatchers("/api/spectator/**").hasAuthority("2")
                     // Register endpoints require manager or player role
-                      .requestMatchers("/api/managePlayer/register/**").hasAnyAuthority("0", "1")
+                      .requestMatchers("/api/managePgitlayer/register/**").hasAnyAuthority("0", "1")
                       .requestMatchers("/api/managePlayer/register/{playerId}").hasAnyAuthority("0", "1")
                       .anyRequest().authenticated()
               )
