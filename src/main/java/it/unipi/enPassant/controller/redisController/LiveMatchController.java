@@ -2,6 +2,7 @@ package it.unipi.enPassant.controller.redisController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.config.JwtFilter;
+import it.unipi.enPassant.controller.mongoController.mongoCRUD.CRUDcontrollerUser;
 import it.unipi.enPassant.model.requests.mongoModel.user.DocumentUser;
 import it.unipi.enPassant.service.JWTService;
 import it.unipi.enPassant.service.redisService.LiveMatchService;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class LiveMatchController {
 
     @Autowired
-    JWTService jwtService;
+    private CRUDcontrollerUser crudControllerUser;
 
     @Autowired
     private LiveMatchService liveMatchService;
@@ -32,6 +33,12 @@ public class LiveMatchController {
             @PathVariable String matchId,
             @PathVariable String category,
             @PathVariable String startingTime) {
+        String[] users = matchId.split("-");
+        if(crudControllerUser.getById(users[0]).getStatusCode().equals(HttpStatus.NOT_FOUND))
+            return ResponseEntity.badRequest().body("User: " + users[0] + " does not exist.");
+        if(crudControllerUser.getById(users[1]).getStatusCode().equals(HttpStatus.NOT_FOUND))
+            return ResponseEntity.badRequest().body("User: " + users[1] + " does not exist.");
+
         boolean status = liveMatchService.addLiveMatch(matchId, category, startingTime);
         if(!status)
             return ResponseEntity.badRequest().body("Match " + matchId + " already exists.");
@@ -52,7 +59,6 @@ public class LiveMatchController {
             @PathVariable String matchId) {
         Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String loggedUser = ((UserDetails) obj).getUsername();
-
         if(!loggedUser.equals(userId)) {
             return ResponseEntity.badRequest().body("You can only insert your own moves");
         }
@@ -102,6 +108,12 @@ public class LiveMatchController {
             String matchId = match.get("matchId");
             String category = match.get("category");
             String startingTime = match.get("startingTime");
+
+            String[] users = matchId.split("-");
+            if(crudControllerUser.getById(users[0]).getStatusCode().equals(HttpStatus.NOT_FOUND))
+                return ResponseEntity.badRequest().body("User: " + users[0] + " does not exist.");
+            if(crudControllerUser.getById(users[1]).getStatusCode().equals(HttpStatus.NOT_FOUND))
+                return ResponseEntity.badRequest().body("User: " + users[1] + " does not exist.");
 
             if (matchId != null && category != null && startingTime != null) {
                 liveMatchService.addLiveMatch(matchId, category, startingTime);

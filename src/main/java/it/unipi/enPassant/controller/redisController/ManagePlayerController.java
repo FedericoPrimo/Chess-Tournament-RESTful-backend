@@ -1,5 +1,6 @@
 package it.unipi.enPassant.controller.redisController;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.unipi.enPassant.controller.mongoController.mongoCRUD.CRUDcontrollerUser;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,17 @@ public class ManagePlayerController {
     List<String> validOutcomes = Arrays.asList("Blitz", "Rapid", "Open");
 
     @Autowired
+    private CRUDcontrollerUser crudControllerUser;
+
+    @Autowired
     private ManagePlayerService managePlayerService;
 
     /*DISQUALIFIED PLAYER SECTION*/
     @PostMapping("/disqualify/{playerId}")
     public ResponseEntity<String> addDisqualifiedPlayer(@PathVariable String playerId) {
+        if(crudControllerUser.getById(playerId).getStatusCode().equals(HttpStatus.NOT_FOUND))
+            return ResponseEntity.badRequest().body("User: " + playerId + " does not exist.");
+
         boolean check = managePlayerService.addDisqualifiedPlayer(playerId);
         if(check)
             return ResponseEntity.badRequest().body("Player " + playerId + " already disqualified.");

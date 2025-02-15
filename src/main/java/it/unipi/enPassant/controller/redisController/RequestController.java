@@ -1,10 +1,14 @@
 package it.unipi.enPassant.controller.redisController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.unipi.enPassant.controller.mongoController.mongoCRUD.CRUDcontrollerUser;
 import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.service.redisService.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +21,15 @@ public class RequestController {
 
     // Add a new request to the queue
     @PostMapping("/insert")
-    public ResponseEntity<Long> addRequest(@RequestBody Request request) {
+    public ResponseEntity<?> addRequest(@RequestBody Request request) {
+        String user = request.getNomeUtente();
+        Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loggedUser = ((UserDetails) obj).getUsername();
+
+        if(!loggedUser.equals(user)) {
+            return ResponseEntity.badRequest().body("You can only submit your own requests.");
+        }
+
         return ResponseEntity.ok(requestService.addRequest(request));
     }
 
