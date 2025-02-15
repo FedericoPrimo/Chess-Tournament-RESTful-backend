@@ -39,7 +39,7 @@ public class TournamentController{
     }
 
     /* this GET allows us to retrive the list of all matches of a specific tournament.
-    It returns a list of jason with white player and black player*/
+    It returns a list of json with white player and black player*/
     @GetMapping("/tournamentMatchList/{category}/{edition}/{location}")
     public ResponseEntity<List<MatchListModel>> getTournamentMatchList(
             @PathVariable String category, @PathVariable int edition, @PathVariable String location){
@@ -53,13 +53,12 @@ public class TournamentController{
 
     /*this GET allows us to retrive the list of all information of a finished match.*/
     @GetMapping("/tournamentMatchList/match/{category}/{edition}/{location}/{white}/{black}")
-    public ResponseEntity<DataTournamentMatchModel> getTournamentMatch(
+    public ResponseEntity<?> getTournamentMatch(
             @PathVariable String category, @PathVariable int edition, @PathVariable String location,
             @PathVariable String white, @PathVariable String black){
         DataTournamentMatchModel tournamentMatch = dataService.tournamentMatchGet(category, edition, location, white, black);
-
-        if (tournamentMatch==null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        if (tournamentMatch == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Match not found");
         }
         return ResponseEntity.ok(tournamentMatch);
     }

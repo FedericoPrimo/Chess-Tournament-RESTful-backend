@@ -46,7 +46,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
     // Create a JSON-formatted response body (adaptable it as needed)
-    String jsonBody = String.format("{\"error\":\"Access denied!\",\"roles\":\"%s\"}", roles);
+    String jsonBody = String.format("{\"error\":\"Access denied!\",\"YourRole\":\"%s\"}", roles);
 
     // Write the response body
     PrintWriter writer = response.getWriter();

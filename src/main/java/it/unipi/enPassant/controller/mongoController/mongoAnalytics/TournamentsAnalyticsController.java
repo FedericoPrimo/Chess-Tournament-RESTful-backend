@@ -85,7 +85,7 @@ public class TournamentsAnalyticsController {
     public ResponseEntity<List<TournamentsAnalyticsModel>> openingOutcomePercentages(@PathVariable int edition) {
         List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.AVGmovesPerTournament(edition);
 
-        if (results == null) {
+        if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(results);
@@ -96,7 +96,7 @@ public class TournamentsAnalyticsController {
     public ResponseEntity<List<TournamentsAnalyticsModel>> TournamentMostFrequentOpening(@PathVariable int edition) {
         List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.tournamentMFO(edition);
 
-        if (results == null) {
+        if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(results);
@@ -107,7 +107,7 @@ public class TournamentsAnalyticsController {
     public ResponseEntity<List<TournamentsAnalyticsModel>> TournamentMatchAVGDuration(@PathVariable int edition) {
         List<TournamentsAnalyticsModel> results = tournamentsAnalyticsService.tournamentMatchDuration(edition);
 
-        if (results == null) {
+        if (results.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(results);

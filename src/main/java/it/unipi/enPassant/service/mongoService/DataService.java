@@ -21,7 +21,9 @@ public class DataService {
 
     public DataUserModel dataUserGet(String username) {
         DocumentUser user = userRepository.findByUsername(username);
-        System.out.println(user);
+        if(user == null){
+            return null;
+        }
 
         if(!user.getType().equals("1")){
             return new DataUserModel(
@@ -54,6 +56,9 @@ public class DataService {
 
     public StatsModel dataGetPlayerStats(String username) {
         DocumentUser user = userRepository.findByUsername(username);
+        if (user == null) {
+            return null;
+        }
         System.out.println(user);
         return new StatsModel(
                 user.getELO(),

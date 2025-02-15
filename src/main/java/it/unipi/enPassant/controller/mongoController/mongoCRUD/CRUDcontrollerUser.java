@@ -21,11 +21,16 @@ public class CRUDcontrollerUser extends CRUDcontroller<DocumentUser, String> {
 
     @Override
     @PostMapping("/create")
-    public DocumentUser create(@RequestBody DocumentUser entity) {
+    public ResponseEntity<?> create(@RequestBody DocumentUser entity) {
+        String username = entity.getId();
+        if (repository.existsById(username)) {
+            return ResponseEntity.badRequest().body("User already exists");
+        }
         String password = entity.getPassword();
         String hashedPsw = passwordEncoder.encode(password);
         entity.setPassword(hashedPsw);
-        return super.create(entity);
+        return ResponseEntity.ok(super.create(entity));
+
     }
     @Override
     @PutMapping("/update/{id}")

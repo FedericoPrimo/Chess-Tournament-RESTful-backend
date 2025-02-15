@@ -39,7 +39,7 @@ public class UserAnalyticsController {
     public ResponseEntity<UserAnalyticsModel> playerMostFrequentOpening(@PathVariable String username) {
         UserAnalyticsModel results = userAnalyticsService.getPlayersMFO(username);
         if (results==null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exists");
         }
         return ResponseEntity.ok(results);
     }
@@ -75,7 +75,7 @@ public class UserAnalyticsController {
         UserAnalyticsModel results = userAnalyticsService.getPlayersWinningMFO(username, outcome);
 
         if (results == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exists");
         }
 
         return ResponseEntity.ok(results);
@@ -94,11 +94,11 @@ public class UserAnalyticsController {
 
     //3 VAR: Get a specific player's number of defeated opponents
     @GetMapping("/player-number-of-defeated-opponents/{username}")
-    public ResponseEntity<UserAnalyticsModel> playerDefeatedOpponents(@PathVariable String username) {
+    public ResponseEntity<?> playerDefeatedOpponents(@PathVariable String username) {
         UserAnalyticsModel results = userAnalyticsService.getPlayerNumberOfDefeatedOpponents(username);
 
         if (results == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exists");
         }
         return ResponseEntity.ok(results);
     }
@@ -133,7 +133,7 @@ public class UserAnalyticsController {
 
         UserAnalyticsModel results = userAnalyticsService.getPlayersNumberOfWonMatches(outcome, username);
         if (results == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exists");
         }
         return ResponseEntity.ok(results);
     }

@@ -24,12 +24,22 @@ public class ManagePlayerService {
     }
 
     /* DISQUALIFIED PLAYER SECTION */
-    public void addDisqualifiedPlayer(String playerId) {
+    public boolean addDisqualifiedPlayer(String playerId) {
+        boolean check = jedisCluster.sismember(DISQUALIFIED_PLAYERS_KEY, playerId);
+        if (check) {
+            return false;
+        }
         jedisCluster.sadd(DISQUALIFIED_PLAYERS_KEY, playerId);
+        return true;
     }
 
-    public void removeDisqualifiedPlayer(String playerId) {
+    public boolean removeDisqualifiedPlayer(String playerId) {
+        boolean check = jedisCluster.sismember(DISQUALIFIED_PLAYERS_KEY, playerId);
+        if (!check) {
+            return false;
+        }
         jedisCluster.srem(DISQUALIFIED_PLAYERS_KEY, playerId);
+        return true;
     }
 
     public boolean isPlayerDisqualified(String playerId) {
@@ -41,7 +51,10 @@ public class ManagePlayerService {
     }
 
     /* ENROLL CATEGORY SECTION */
-    public void registerPlayer(String playerId, String category) {
+    public boolean registerPlayer(String playerId, String category) {
+        boolean status = jedisCluster.hexists(REGISTERED_PLAYERS_KEY, playerId);
+        if(status)
+            return false;
 
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(playerId).and("state").is(1));
@@ -49,9 +62,10 @@ public class ManagePlayerService {
         boolean isDisqualified = mongoTemplate.exists(query, "user");
 
         if (isDisqualified) {
-            return;
+            return false;
         }
         jedisCluster.hset(REGISTERED_PLAYERS_KEY, playerId, category);
+        return true;
     }
 
     public boolean removeRegisteredPlayer(String playerId) {

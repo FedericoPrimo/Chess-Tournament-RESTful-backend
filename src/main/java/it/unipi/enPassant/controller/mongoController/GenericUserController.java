@@ -94,18 +94,17 @@ public abstract class GenericUserController {
                                                       @PathVariable int pageSize){
     List<String> data = dataservice.getAllUserIds(pageNo, pageSize);
 
-    if (data==null) {
+    if (data.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     return ResponseEntity.ok(data);
   }
 
   @GetMapping("/searchPlayerStats/{username}")
-  protected ResponseEntity<StatsModel> searchPlayerStats(@PathVariable String username){
+  protected ResponseEntity<?> searchPlayerStats(@PathVariable String username){
     StatsModel stats = dataservice.dataGetPlayerStats(username);
-
     if (stats==null) {
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player " + username + " not found.");
     }
     return ResponseEntity.ok(stats);
   }

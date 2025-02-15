@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.model.requests.redisModel.Request;
 import it.unipi.enPassant.service.redisService.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,25 +17,26 @@ public class RequestController {
 
     // Add a new request to the queue
     @PostMapping("/insert")
-    public Long addRequest(@RequestBody Request request) {
-        return requestService.addRequest(request);
+    public ResponseEntity<Long> addRequest(@RequestBody Request request) {
+        return ResponseEntity.ok(requestService.addRequest(request));
     }
 
     // Read and remove the next request from the queue
     @GetMapping("/next")
-    public Request consumeNextRequest() {
-        return requestService.consumeNextRequest();
+    public ResponseEntity<?> consumeNextRequest() {
+        return ResponseEntity.ok(requestService.consumeNextRequest());
     }
 
     // Get the number of requests currently in the queue
     @GetMapping("/size")
-    public Long getQueueSize() {
-        return requestService.getQueueSize();
+    public ResponseEntity<Long> getQueueSize() {
+        return ResponseEntity.ok(requestService.getQueueSize());
     }
 
     // Completely reset the queue
     @DeleteMapping("/reset")
-    public void resetQueue() {
+    public ResponseEntity<String> resetQueue() {
         requestService.resetQueue();
+        return ResponseEntity.ok("Queue has been reset.");
     }
 }

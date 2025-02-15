@@ -2,6 +2,7 @@ package it.unipi.enPassant.controller.redisController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.unipi.enPassant.service.redisService.ManagePlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Response;
@@ -19,23 +20,29 @@ public class ManagePlayerController {
 
     /*DISQUALIFIED PLAYER SECTION*/
     @PostMapping("/disqualify/{playerId}")
-    public String addDisqualifiedPlayer(@PathVariable String playerId) {
-        managePlayerService.addDisqualifiedPlayer(playerId);
-        return "Player " + playerId + " added to disqualified list.";
+    public ResponseEntity<String> addDisqualifiedPlayer(@PathVariable String playerId) {
+        boolean check = managePlayerService.addDisqualifiedPlayer(playerId);
+        if(check)
+            return ResponseEntity.badRequest().body("Player " + playerId + " already disqualified.");
+        else
+            return ResponseEntity.ok("Player " + playerId + " added to disqualified list.");
     }
 
     @DeleteMapping("/disqualify/{playerId}")
-    public String removeDisqualifiedPlayer(@PathVariable String playerId) {
-        managePlayerService.removeDisqualifiedPlayer(playerId);
-        return "Player " + playerId + " removed from disqualified list.";
+    public ResponseEntity<String> removeDisqualifiedPlayer(@PathVariable String playerId) {
+        boolean check = managePlayerService.removeDisqualifiedPlayer(playerId);
+        if(!check)
+            return ResponseEntity.badRequest().body("Player " + playerId + " is not disqualified.");
+        else
+            return ResponseEntity.ok("Player " + playerId + " removed from disqualified list.");
     }
 
     @GetMapping("/disqualified/{playerId}")
-    public String isPlayerDisqualified(@PathVariable String playerId) {
+    public ResponseEntity<String> isPlayerDisqualified(@PathVariable String playerId) {
        if(managePlayerService.isPlayerDisqualified(playerId))
-           return "Player " + playerId + " is disqualified.";
+           return ResponseEntity.ok("Player " + playerId + " is disqualified.");
        else
-           return "Player " + playerId + " is not disqualified.";
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player " + playerId + " is not disqualified.");
     }
 
     @GetMapping("/disqualifiedList")
@@ -45,9 +52,12 @@ public class ManagePlayerController {
 
     /*ENROLL CATEGORY SECTION*/
     @PostMapping("/register/{playerId}/{category}")
-    public String registerPlayer(@PathVariable String playerId, @PathVariable String category) {
-        managePlayerService.registerPlayer(playerId, category);
-        return "Player " + playerId + " registered in category " + category + ".";
+    public ResponseEntity<String> registerPlayer(@PathVariable String playerId, @PathVariable String category) {
+        boolean status = managePlayerService.registerPlayer(playerId, category);
+        if(!status)
+            return ResponseEntity.badRequest().body("Player " + playerId + " disqualified or already registered in category " + category + ".");
+        else
+            return ResponseEntity.ok("Player " + playerId + " registered in category " + category + ".");
     }
 
     @DeleteMapping("/register/{playerId}")
@@ -56,15 +66,15 @@ public class ManagePlayerController {
         if(status)
             return ResponseEntity.ok("Player " + playerId + " removed from registered list.");
         else
-            return ResponseEntity.badRequest().body("Player " + playerId + " is not registered.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player " + playerId + " is not registered.");
     }
 
     @GetMapping("/register/{playerId}")
-    public String isPlayerRegistered(@PathVariable String playerId) {
+    public ResponseEntity<String> isPlayerRegistered(@PathVariable String playerId) {
         if(managePlayerService.isPlayerRegistered(playerId))
-            return "Player " + playerId + " is enrolled.";
+            return ResponseEntity.ok("Player " + playerId + " is enrolled");
         else
-            return "Player " + playerId + " is not enrolled.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player " + playerId + " is not enrolled.");
     }
 
     @GetMapping("/registerList")

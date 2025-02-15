@@ -4,6 +4,7 @@ import it.unipi.enPassant.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -101,7 +102,7 @@ public class SecurityConfig {
                     // Spectator endpoints require spectator role ("2")
                       .requestMatchers("/api/spectator/**").hasAuthority("2")
                     // Register endpoints require manager or player role
-                      .requestMatchers("/api/managePgitlayer/register/**").hasAnyAuthority("0", "1")
+                      .requestMatchers("/api/managePlayer/register/**").hasAnyAuthority("0", "1")
                       .requestMatchers("/api/managePlayer/register/{playerId}").hasAnyAuthority("0", "1")
                       .anyRequest().authenticated()
               )
@@ -111,17 +112,16 @@ public class SecurityConfig {
             .httpBasic(httpBasic -> httpBasic.disable())
             .exceptionHandling(exception -> exception
                     .accessDeniedHandler(accessDeniedHandler)
+                    .authenticationEntryPoint((req, res, ex) -> {
+                      res.setContentType("application/json;charset=UTF-8");
+                      res.setStatus(HttpStatus.FORBIDDEN.value());
+                      res.getWriter().write("{\"error\":\"Access denied - authentication required. If you are authenticated, please check if your request is formulated correctly.\"}");
+                    })
             )
             // Add JWT token filter
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-  @Bean
-  public DefaultMethodSecurityExpressionHandler expressionHandler() {
-    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-    expressionHandler.setDefaultRolePrefix(""); // Removes the prefix ROLE_ from roles
-    return expressionHandler;
   }
 
 }

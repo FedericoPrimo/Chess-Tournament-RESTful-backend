@@ -63,8 +63,12 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
 
     @Override
     @PostMapping("/create")
-    public DocumentTournament create(@RequestBody DocumentTournament tournament) {
-        DocumentTournament newTournament = super.create(tournament);
+    public ResponseEntity<?> create(@RequestBody DocumentTournament tournament) {
+        if (repository.existsById(tournament.getId())) {
+            return ResponseEntity.badRequest().body("Tournament already exists");
+        }
+
+        DocumentTournament newTournament = repository.save(tournament);
 
         // Check if the tournament has rawMatches and collect unique players
         if (newTournament.getRawMatches() != null) {
@@ -79,7 +83,7 @@ public class CRUDcontrollerTournament extends CRUDcontroller<DocumentTournament,
                 userUpdateService.updateFields(player);
             }
         }
-        return newTournament; // Save the updated tournament
+        return ResponseEntity.ok(newTournament); // Save the updated tournament
     }
 
     @Override

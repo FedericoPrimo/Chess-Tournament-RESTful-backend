@@ -29,8 +29,11 @@ public class LiveMatchController {
             @PathVariable String matchId,
             @PathVariable String category,
             @PathVariable String startingTime) {
-        liveMatchService.addLiveMatch(matchId, category, startingTime);
-        return ResponseEntity.ok("Match submitted successfully.");
+        boolean status = liveMatchService.addLiveMatch(matchId, category, startingTime);
+        if(!status)
+            return ResponseEntity.badRequest().body("Match " + matchId + " not submitted successfully.");
+        else
+            return ResponseEntity.ok("Match submitted successfully.");
     }
 
     @GetMapping("/getLiveMatches")
@@ -56,15 +59,24 @@ public class LiveMatchController {
     }
 
     @GetMapping("/retrieveMoveList/{matchId}")
-    public ResponseEntity<List<String>> retrieveMoveList(@PathVariable String matchId) {
+    public ResponseEntity<?> retrieveMoveList(@PathVariable String matchId) {
         List<String> moves = liveMatchService.retrieveMovesList(matchId);
-        return ResponseEntity.ok(moves);
+        if(moves.isEmpty())
+            return ResponseEntity.ok("No moves found for match " + matchId + ".\n" +
+                    "Check if the match id is correct. Or maybe the match has not started yet.");
+        else{
+            return ResponseEntity.ok(moves);
+        }
     }
 
     @GetMapping("/matchDetails/{matchId}")
-    public ResponseEntity<LiveMatch> getMatchDetails(@PathVariable String matchId) {
+    public ResponseEntity<?> getMatchDetails(@PathVariable String matchId) {
         LiveMatch details = liveMatchService.getMatchDetails(matchId);
-        return ResponseEntity.ok(details);
+        if(details == null)
+            return ResponseEntity.badRequest().body("Match details " + matchId + " not found.");
+        else{
+            return ResponseEntity.ok(details);
+        }
     }
 
     @DeleteMapping("/removeLiveMatch/{matchId}")
@@ -94,7 +106,10 @@ public class LiveMatchController {
 
     @PostMapping("/insertMatchResult/{matchId}/{winner}/{ECO}")
     public ResponseEntity<String> insertMatchResult(@PathVariable String matchId, @PathVariable String winner, @PathVariable String ECO) {
-        liveMatchService.insertMatchResult(matchId, winner, ECO);
-        return ResponseEntity.ok("Match Result of " + matchId + " inserted successfully.");
+        boolean status = liveMatchService.insertMatchResult(matchId, winner, ECO);
+        if(!status)
+            return ResponseEntity.badRequest().body("Match Result of " + matchId + " not inserted successfully. Check the parameters.");
+        else
+            return ResponseEntity.ok("Match Result of " + matchId + " inserted successfully.");
     }
 }

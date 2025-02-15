@@ -24,15 +24,16 @@ public class LiveMatchService {
         this.jedisCluster = jedisCluster;
     }
 
-    public void addLiveMatch(String matchId, String category, String startingTime) {
+    public boolean addLiveMatch(String matchId, String category, String startingTime) {
         try {
             LiveMatch liveMatch = new LiveMatch(category, startingTime);
             String matchJson = objectMapper.writeValueAsString(liveMatch);
             writeWithConsistency(LIVE_MATCHES_KEY + matchId, matchJson);
             jedisCluster.sadd(LIVE_MATCHES_KEY, matchId);
             initializeProgressiveMoveKey(matchId);
+            return true;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error serializing LiveMatch", e);
+            return false;
         }
     }
 
@@ -49,7 +50,7 @@ public class LiveMatchService {
         }
     }
 
-    public void insertMatchResult(String matchId, String winner, String ECO) {
+    public boolean insertMatchResult(String matchId, String winner, String ECO) {
         try {
             String matchJson = readRedis(LIVE_MATCHES_KEY + matchId);
             if (matchJson != null) {
@@ -59,8 +60,12 @@ public class LiveMatchService {
                 liveMatch.setECO(ECO);
                 writeWithConsistency(LIVE_MATCHES_KEY + matchId, objectMapper.writeValueAsString(liveMatch));
             }
+            else {
+                return false;
+            }
+            return true;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error updating LiveMatch", e);
+            return false;
         }
     }
 
@@ -70,12 +75,10 @@ public class LiveMatchService {
             return false;
         }
 
-        for (int i = 0; i < REPLICATION_FACTOR; i++) {
-            jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":replica" + i);
-            jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":progressive");
-            jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":moveList");
-        }
-        jedisCluster.srem(LIVE_MATCHES_KEY, matchId);
+
+        jedisCluster.del(LIVE_MATCHES_KEY + matchId);
+        jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":progressive");
+        jedisCluster.del(LIVE_MATCHES_KEY + matchId + ":moveList");
         return true;
     }
 

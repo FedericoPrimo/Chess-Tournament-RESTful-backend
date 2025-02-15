@@ -20,15 +20,20 @@ public abstract class CRUDcontroller<T, ID> {
     }
 
     @GetMapping("/read/{pageNo}/{pageSize}")
-    public List<T> getAll(@PathVariable int pageNo, @PathVariable int pageSize) {
+    public ResponseEntity<?> getAll(@PathVariable int pageNo, @PathVariable int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<T> page = repository.findAll(pageable);
-        return page.getContent();
+        List<T> content = page.getContent();
+        if(content.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No content found");
+        } else {
+            return ResponseEntity.ok(content);
+        }
     }
 
     @PostMapping("/create")
-    public T create(@RequestBody T entity) {
-        return repository.save(entity);
+    public ResponseEntity<?> create(@RequestBody T entity) {
+        return ResponseEntity.ok(repository.save(entity));
     }
 
     @GetMapping("findById/{id}")
