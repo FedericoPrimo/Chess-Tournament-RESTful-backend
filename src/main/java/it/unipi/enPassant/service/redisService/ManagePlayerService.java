@@ -26,7 +26,7 @@ public class ManagePlayerService {
     /* DISQUALIFIED PLAYER SECTION */
     public boolean addDisqualifiedPlayer(String playerId) {
         boolean check = jedisCluster.sismember(DISQUALIFIED_PLAYERS_KEY, playerId);
-        if (!check) {
+        if (check) {
             return false;
         }
         jedisCluster.sadd(DISQUALIFIED_PLAYERS_KEY, playerId);
