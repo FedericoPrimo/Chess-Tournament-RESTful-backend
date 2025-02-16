@@ -57,7 +57,7 @@ public class ManagePlayerService {
             return false;
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(playerId).and("state").is(1));
+        query.addCriteria(Criteria.where("id").is(playerId).and("Status").is(1));
 
         boolean isDisqualified = mongoTemplate.exists(query, "user");
 

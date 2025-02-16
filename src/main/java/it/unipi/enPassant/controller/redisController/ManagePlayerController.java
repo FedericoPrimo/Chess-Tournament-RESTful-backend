@@ -34,7 +34,7 @@ public class ManagePlayerController {
             return ResponseEntity.badRequest().body("User: " + playerId + " does not exist.");
 
         boolean check = managePlayerService.addDisqualifiedPlayer(playerId);
-        if(check)
+        if(!check)
             return ResponseEntity.badRequest().body("Player " + playerId + " already disqualified.");
         else
             return ResponseEntity.ok("Player " + playerId + " added to disqualified list.");

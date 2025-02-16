@@ -69,7 +69,7 @@ public class FromRedisToMongoController {
             if (user instanceof String userId) {
                 System.out.println(userId);
                 Query query = new Query(Criteria.where("_id").is(userId));
-                Update update = new Update().set("status", 1);
+                Update update = new Update().set("Status", 1);
                 mongoTemplate.updateFirst(query, update, "user");
             }
         }
