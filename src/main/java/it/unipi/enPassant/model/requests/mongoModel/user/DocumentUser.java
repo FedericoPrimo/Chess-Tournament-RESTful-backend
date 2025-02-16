@@ -17,7 +17,7 @@ public class DocumentUser {
     private String Surname;
     private String Type;
     private Integer ELO;
-    private Boolean Status; // True if the player is disqualified
+    private Boolean Status;
     private List<DocumentMatchUser> Matches;
 
 
@@ -25,7 +25,7 @@ public class DocumentUser {
     private Integer NumberOfVictories;
     private Integer NumberOfDefeats;
     private Integer NumberOfDraws;
-    private Double avgMovesNumber; // Unico campo che inizia con minuscola
+    private Double avgMovesNumber;
 
 
     public DocumentUser() {}

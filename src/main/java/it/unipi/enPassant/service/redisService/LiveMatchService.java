@@ -88,6 +88,11 @@ public class LiveMatchService {
 
     public Boolean addMoves(String moves, String user, String matchId) {
 
+        String matchJson = readRedis(LIVE_MATCHES_KEY + matchId);
+        if (matchJson == null) {
+            return false;
+        }
+
         String progressiveKey = LIVE_MATCHES_KEY + matchId + ":progressive";
         String moveListKey = LIVE_MATCHES_KEY + matchId + ":moveList";
         initializeProgressiveMoveKey(matchId);
