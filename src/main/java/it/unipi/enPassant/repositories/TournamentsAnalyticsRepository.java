@@ -22,7 +22,7 @@ public interface TournamentsAnalyticsRepository extends MongoRepository<Document
     })
     List<TournamentsAnalyticsModel> calculateAvgMovesPerWinner(int edition, String category);
 
-    //2: Get the list of players who participated in an edition and the number of matches they won in each category they enrolled in that year
+    //2: Get the list of players who participated in a given edition and category and the number of matches they won
     @Aggregation(pipeline = {
             "{ $unwind: '$RawMatches' }",
             "{ $match: { 'RawMatches.Winner': { $exists: true, $ne: 'draw' }, 'Edition': ?0, 'Category': ?1 } }",

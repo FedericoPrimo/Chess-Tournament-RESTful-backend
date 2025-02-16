@@ -30,8 +30,9 @@ public class UserMatchUpdateModel {
 
     public UserMatchUpdateModel() {}
 
-    public UserMatchUpdateModel(UserMatchUpdateModel userMatch, String OpponentId, String Outcome, String Opening, Integer TournamentEdition, String TournamentCategory, Integer NumberOfMoves) {
+    public UserMatchUpdateModel(UserMatchUpdateModel userMatch, String Color, String OpponentId, String Outcome, String Opening, Integer TournamentEdition, String TournamentCategory, Integer NumberOfMoves) {
         this.userMatch = userMatch;
+        this.Color = Color;
         this.OppponentId = OpponentId;
         this.Outcome = Outcome;
         this.Opening = Opening;
