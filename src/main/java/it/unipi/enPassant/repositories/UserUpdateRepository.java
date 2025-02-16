@@ -13,7 +13,7 @@ public interface UserUpdateRepository extends MongoRepository<DocumentUser, Stri
     //*UPDATE MATCH LIST*
     @Aggregation(pipeline = {
             "{ $match: { _id: ?0, Type: '1' } }",
-            "{ $set: { Matches: ?1 } }",
+            "{ $set: { Matches: { $cond: { if: { $eq: [?1, []] }, then: \"$Matches\", else: { $concatArrays: [ { $ifNull: [\"$Matches\", []] }, [ ?1 ] ] } } } } }",
             "{ $merge: { into: 'user', on: '_id', whenMatched: 'merge', whenNotMatched: 'fail' } }"
     })
     void updateUserMatches(String username, List<UserMatchUpdateModel> matches);
