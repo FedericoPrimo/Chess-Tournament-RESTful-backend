@@ -10,17 +10,6 @@ The goal of this project is to design and implement a backend system capable of:
 
 The project was developed for a Large Scale and Multi-Structured Databases course at the University of Pisa.
 
-## 🧠 Skills Demonstrated
-- REST API design and implementation
-- Spring Boot application architecture
-- Domain modeling for non-trivial business logic
-- Polyglot persistence:
-  - MongoDB for persistent data
-  - Redis for fast-access and transient state
-- API documentation with Swagger
-- Team-based development workflow
-- Java backend engineering best practices
-
 ## 🏗️ Architecture Overview
 - **Spring Boot** as the application framework
 - **MongoDB** used for long-term storage of tournaments, players, and match data
